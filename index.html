@@ -206,7 +206,7 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .g-toggle.open .chev{transform:rotate(180deg)}
 .g-body{display:flex;flex-direction:column;margin-top:6px}
 .g-body .seg{margin-bottom:6px}
-.g-title{font-size:var(--fs-xl);color:var(--pulse-strong)}
+.g-title{font-size:var(--fs-sm);color:var(--pulse-strong)}
 .seg{display:flex;background:var(--bg2);border:1.5px solid var(--line);border-radius:999px;padding:2px}
 .seg button{font-size:var(--fs-xs);padding:3px 10px;border-radius:999px;color:var(--ink-3);min-height:28px}
 .seg button.on{background:var(--pulse);color:#fff}
@@ -331,6 +331,8 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
   -webkit-appearance:none;appearance:none;font-family:inherit;
 }
 .diary textarea:focus{outline:0;border-color:var(--pulse)}
+/* 안내 문구만 작게 — 입력 글자는 16px 유지(더 작으면 아이폰이 화면을 확대한다) */
+.diary textarea::placeholder{font-size:var(--fs-xs);color:var(--ink-3)}
 .diary .saved{font-size:var(--fs-xs);color:var(--ink-2);margin-top:3px;min-height:1em}
 
 .cheer{display:flex;align-items:center;gap:8px;margin-top:9px;padding:8px 10px;background:var(--pulse-wash);
@@ -571,7 +573,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25w</span>
+    <span class="ver">v2026-09-25y</span>
   </footer>
 </div>
 
@@ -716,7 +718,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   function toolIcon(key){
     var p={
       pencil:'<path d="M4.2 19.8l1.1-4.6L16.3 4.2a2.2 2.2 0 0 1 3.1 3.1L8.4 18.4z"'+W+'/><path d="M14.4 6.1l3.1 3.1"/><path d="M5.3 15.2l3.1 3.1"/>',
-      abc:'<rect x="3.5" y="4" width="17" height="16" rx="4"'+W+'/><path d="M7.5 16l3-8 3 8M8.6 13.2h3.8"/><path d="M15.5 10v6"/>',
+      abc:'<rect x="3" y="4" width="18" height="16" rx="4"'+W+'/><path d="M5.6 16.6L8.8 7.6l3.2 9M6.8 13.6h4"/><circle cx="15.7" cy="14.3" r="2.3"/><path d="M18 11.6v5"/>',   /* [Aa] */
       ruler:'<g transform="rotate(-38 12 12)"><rect x="1.8" y="8.2" width="20.4" height="7.6" rx="1.6"'+W+'/><path d="M5.5 8.4v3M8.5 8.4v2M11.5 8.4v3M14.5 8.4v2M17.5 8.4v3"/></g>',
       magnifier:'<circle cx="10.3" cy="10.3" r="6.1"'+W+'/><path d="M14.8 14.8l5.4 5.4"/><path d="M7.6 8.6a3.2 3.2 0 0 1 2.6-1.5"/>',
       book:'<path d="M12 6.6C10 5.1 7 4.6 3.4 5.1v13c3.6-.5 6.6 0 8.6 1.5 2-1.5 5-2 8.6-1.5v-13C17 4.6 14 5.1 12 6.6z"'+W+'/><path d="M12 6.6v13"/>',
@@ -1190,9 +1192,9 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         '<button class="btn" data-move-one="'+t.id+'" style="flex:none">옮기기</button></div></div>'+
       (t.by?'<div class="chint">처음 작성 '+byTag(t.by)+'</div>':'')+
       (c.err?'<div class="cerr">'+esc(c.err)+'</div>':'')+
-      '<div class="cacts"><button class="btn warn" data-edit-del="'+t.id+'">삭제</button>'+
+      '<div class="cacts"><button class="btn primary" data-edit-save>저장</button>'+
       '<button class="btn" data-compose-cancel>취소</button>'+
-      '<button class="btn primary" data-edit-save>저장</button></div></div>';
+      '<button class="btn warn" data-edit-del="'+t.id+'">삭제</button></div></div>';
   }
   function previewCount(c){
     var from=c.from,to=c.to;
@@ -1289,8 +1291,8 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         '<div class="chint">옮기면 그날의 메인 학습이 돼요.</div>':'')+
       (kidEdit.err?'<div class="cerr">'+esc(kidEdit.err)+'</div>':'')+
       '<div class="kf-foot"><span class="kf-me">'+(k.by?'작성 '+byTag(k.by):'')+'</span>'+
-      '<button class="btn warn" data-kdel="'+k.id+'">삭제</button><button class="btn" data-kedit-cancel>취소</button>'+
-      '<button class="btn primary" data-kedit-save>저장</button></div></div>';
+      '<button class="btn primary" data-kedit-save>저장</button><button class="btn" data-kedit-cancel>취소</button>'+
+      '<button class="btn warn" data-kdel="'+k.id+'">삭제</button></div></div>';
   }
   function kidsHtml(t){
     var html=kidsOf(t.id).map(function(k){
