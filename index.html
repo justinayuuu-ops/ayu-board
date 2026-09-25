@@ -353,7 +353,12 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .by{flex:none;display:inline-flex;align-items:center;font-size:11px;line-height:1;padding:3px 6px;border-radius:999px;color:#fff;margin-left:4px;vertical-align:1px}
 .kid{display:flex;align-items:center;gap:7px;padding:3px 0 3px 18px;font-size:var(--fs-sm);line-height:1.4}
 .kid-l{flex:none;color:var(--ink-3);width:14px}
-.kid .kt{flex:1;min-width:0;word-break:break-word}
+.kid .kt{flex:1;min-width:0;word-break:break-word;text-align:left;padding:2px 0}
+.kid.ghost .kt{color:#a9b7b3;text-decoration:line-through;text-decoration-color:#c9d3d0}
+.kid.ghost .kbox{border-color:#dfe6e4;background:var(--bg2)}
+.kid.ghost .carry.mv{color:#6f7f7b;background:#eef2f1}
+.kidform .dates{display:flex;align-items:center;gap:7px}
+.kidform .dates input{flex:1;min-width:0}
 .kid.on .kt{color:var(--ink-3)}
 .kbox{flex:none;position:relative;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);background:#fff}
 .kbox::after{content:"";position:absolute;top:50%;left:50%;width:var(--tap);height:var(--tap);transform:translate(-50%,-50%)}
@@ -564,7 +569,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25p</span>
+    <span class="ver">v2026-09-25q</span>
   </footer>
 </div>
 
@@ -953,6 +958,18 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     relocate(t,to);
     syncKids(); save(); return null;
   }
+  function moveKid(id,to){
+    var k=findTodo(id); if(!k||!k.parent||k.ghost||k.kind==="note") return "추가 학습을 찾지 못했어요.";
+    if(!to||to<CUR||to>END) return "오늘 이후 날짜를 골라 주세요.";
+    var from=k.date;
+    if(from<CUR){
+      state.todos.push({id:newId(),date:from,subj:k.subj,text:k.text,parent:k.parent,kind:"task",ghost:true,movedTo:to,
+        by:k.by,u:Date.now(),ord:k.ord||0});
+    }
+    delete k.parent; delete k.kind;
+    k.date=to; k.movedFrom=from; k.ord=todosFor(to).length; k.u=Date.now();
+    save(); return null;
+  }
   function mmdd(d){return d.slice(5,7)+"/"+d.slice(8,10);}
   function pendingOf(d){return tasksFor(d).filter(function(t){return !t.done&&!t.skip;});}
   function moveTodos(from,to){
@@ -1259,16 +1276,37 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   }
   /* 하위 항목 — ㄴ 추가 학습(체크하면 빨간 동그라미) · ㄴ 코멘트(말풍선) */
   var kidForm=null;   /* {pid, kind, text, err} */
+  var kidEdit=null;   /* 하위 항목 고치기 {id, text, err} */
+  function kidEditArea(k){
+    var task=k.kind!=="note";
+    return '<div class="kidform">'+
+      '<div class="newsub"><input type="text" id="kidEd" data-ke="text" value="'+esc(kidEdit.text)+'" maxlength="80" '+INPUT_ATTRS+'></div>'+
+      (task?'<div class="dates"><span class="kf-me" style="flex:none">다른 날로 옮기기</span>'+
+        '<input type="date" id="kidMv" value="'+(k.date<CUR?CUR:k.date)+'" min="'+CUR+'" max="'+END+'" aria-label="옮길 날짜">'+
+        '<button class="btn" data-kmove="'+k.id+'" style="flex:none">옮기기</button></div>'+
+        '<div class="chint">옮기면 그날의 메인 학습이 돼요.</div>':'')+
+      (kidEdit.err?'<div class="cerr">'+esc(kidEdit.err)+'</div>':'')+
+      '<div class="kf-foot"><span class="kf-me">'+(k.by?'작성 '+byTag(k.by):'')+'</span>'+
+      '<button class="btn warn" data-kdel="'+k.id+'">삭제</button><button class="btn" data-kedit-cancel>취소</button>'+
+      '<button class="btn primary" data-kedit-save>저장</button></div></div>';
+  }
   function kidsHtml(t){
     var html=kidsOf(t.id).map(function(k){
+      if(kidEdit&&kidEdit.id===k.id) return kidEditArea(k);
+      if(k.ghost){
+        return '<div class="kid ghost"><span class="kid-l">ㄴ</span><span class="kbox"></span>'+
+          '<span class="kt">'+esc(k.text)+'</span>'+
+          '<button class="carry mv" data-open="'+k.movedTo+'">이동 → '+mmdd(k.movedTo)+'</button>'+
+          '<button class="del" data-del="'+k.id+'" aria-label="자국 지우기">'+icon("close")+'</button></div>';
+      }
       if(k.kind==="note"){
         return '<div class="kid note"><span class="kid-l">ㄴ</span><span class="kic">'+icon("chat")+'</span>'+
-          '<span class="kt">'+esc(k.text)+'</span>'+byTag(k.by)+
+          '<button class="kt" data-kedit="'+k.id+'">'+esc(k.text)+'</button>'+byTag(k.by)+
           '<button class="del" data-del="'+k.id+'" aria-label="코멘트 삭제">'+icon("close")+'</button></div>';
       }
       return '<div class="kid'+(k.done?" on":"")+'"><span class="kid-l">ㄴ</span>'+
         '<button class="kbox" data-todo="'+k.id+'" aria-label="'+(k.done?"완료 취소":"완료 표시")+'">'+(k.done?redCircle(pop==="t:"+k.id):"")+'</button>'+
-        '<span class="kt"><span class="hl">'+esc(k.text)+'</span></span>'+byTag(k.by)+
+        '<button class="kt" data-kedit="'+k.id+'"><span class="hl">'+esc(k.text)+'</span></button>'+byTag(k.by)+
         '<button class="del" data-del="'+k.id+'" aria-label="추가 학습 삭제">'+icon("close")+'</button></div>';
     }).join("");
     if(kidForm&&kidForm.pid===t.id){
@@ -1676,6 +1714,26 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         toast(kk==="note"?"코멘트를 달았어요.":"추가 학습을 넣었어요.");return;
       }
     }
+    if((el=up(e.target,"[data-kedit]"))){
+      var ke0=findTodo(el.getAttribute("data-kedit"));
+      if(ke0){kidEdit={id:ke0.id,text:ke0.text,err:""};kidForm=null;composer=null;renderDay();}
+      return;
+    }
+    if(kidEdit){
+      if(up(e.target,"[data-kedit-cancel]")){kidEdit=null;renderDay();return;}
+      if(up(e.target,"[data-kedit-save]")){
+        var kt=findTodo(kidEdit.id),tx=(kidEdit.text||"").trim();
+        if(!tx){kidEdit.err="내용을 적어 주세요.";renderDay();return;}
+        if(kt){kt.text=tx;kt.u=Date.now();save();}
+        kidEdit=null;renderAll();toast("고쳤어요.");return;
+      }
+      if((el=up(e.target,"[data-kdel]"))){delTodo(el.getAttribute("data-kdel"));kidEdit=null;renderAll();toast("지웠어요.");return;}
+      if((el=up(e.target,"[data-kmove]"))){
+        var kto=($("kidMv")||{}).value,kerr=moveKid(el.getAttribute("data-kmove"),kto);
+        if(kerr){kidEdit.err=kerr;renderDay();return;}
+        kidEdit=null;renderAll();toast(label(kto)+"의 메인 학습으로 옮겼어요.");return;
+      }
+    }
     if((el=up(e.target,"[data-move-one]"))){
       var mid=el.getAttribute("data-move-one"),mto=($("mvDate")||{}).value;
       var me2=moveOne(mid,mto);
@@ -1692,7 +1750,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     if((el=up(e.target,"[data-del]"))){delTodo(el.getAttribute("data-del"));renderAll();toast("학습을 지웠어요.");return;}
     if((el=up(e.target,"[data-edit]"))){
       var te=findTodo(el.getAttribute("data-edit"));
-      if(te){kidForm=null;openEditor(te);renderDay();}
+      if(te){kidForm=null;kidEdit=null;openEditor(te);renderDay();}
       return;
     }
 
@@ -1808,6 +1866,8 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   /* 글자 입력은 상태에만 담는다 — 다시 그리지 않아 키보드가 닫히지 않는다 */
   var noteTimer=null;
   function bindField(e){
+    var kx=up(e.target,"[data-ke]");
+    if(kx&&kidEdit){kidEdit.text=kx.value;kidEdit.err="";return;}
     var kf=up(e.target,"[data-k]");
     if(kf&&kidForm){kidForm.text=kf.value;kidForm.err="";return;}
     var n=up(e.target,"[data-note]");
