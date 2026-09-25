@@ -74,8 +74,9 @@
   --shadow-2:0 8px 28px rgba(10,60,48,.16);
   --st-shadow:drop-shadow(0 1.5px 1.5px rgba(0,0,0,.2));
 
-  --fs-xs:12px; --fs-sm:14px; --fs-md:14px; --fs-xl:16px; --fs-2xl:19px;
-  --fs-score:clamp(17px,4.9vw,21px);
+  /* 글자 크기 5단 — 12 보조 · 14 설명 · 15 본문(학습 이름) · 17 영역 제목 · 22 앱 제목 */
+  --fs-xs:12px; --fs-sm:14px; --fs-md:15px; --fs-xl:17px; --fs-2xl:22px;
+  --fs-score:clamp(17px,4.8vw,20px);
 
   --safe-t:env(safe-area-inset-top,0px);
   --safe-b:env(safe-area-inset-bottom,0px);
@@ -156,12 +157,12 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 /* 글자는 하늘 위에 바로 올리지 않고 반투명 흰 판 위에 — 하늘색이 바뀌어도 늘 또렷하게 */
 .flight .fl-top{display:flex;align-items:stretch;gap:6px;position:relative;z-index:2}
 .flight .fl-card{flex:none;background:rgba(255,255,255,.9);border-radius:10px;padding:3px 9px 4px;min-width:0;box-shadow:0 1px 3px rgba(0,60,50,.12)}
-.flight .fl-k{font-size:11px;line-height:1.3;color:var(--sky-strong)}
-.flight .fl-lv{font-size:16px;line-height:1.2;white-space:nowrap;color:var(--ink)}
+.flight .fl-k{font-size:var(--fs-xs);line-height:1.3;color:var(--sky-strong)}
+.flight .fl-lv{font-size:var(--fs-md);line-height:1.2;white-space:nowrap;color:var(--ink)}
 .flight .fl-say{font-size:var(--fs-xs);color:var(--ink-2)}
 .flight .fl-alt{text-align:right;flex:none;display:flex;flex-direction:column;justify-content:center}
-.flight .fl-alt b{display:block;font-weight:400;font-size:17px;line-height:1.15;font-variant-numeric:tabular-nums;color:var(--pulse-strong)}
-.flight .fl-alt span{font-size:11px;white-space:nowrap;color:var(--ink-2)}
+.flight .fl-alt b{display:block;font-weight:400;font-size:var(--fs-xl);line-height:1.15;font-variant-numeric:tabular-nums;color:var(--pulse-strong)}
+.flight .fl-alt span{font-size:var(--fs-xs);white-space:nowrap;color:var(--ink-2)}
 .flight.dark .fl-card{background:rgba(255,255,255,.94)}
 .flight .runway{position:relative;flex:1;min-width:60px;z-index:1}
 .flight .path{position:absolute;inset:0;width:100%;height:100%}
@@ -570,7 +571,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25u</span>
+    <span class="ver">v2026-09-25v</span>
   </footer>
 </div>
 
