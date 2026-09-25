@@ -290,14 +290,25 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .todo.on .box .ic{opacity:.5}
 .todo .txt{flex:1;min-width:0;display:flex;align-items:center;gap:7px;text-align:left;padding:2px 0;line-height:1.4}
 .todo .txt .tt{min-width:0;word-break:break-word}
-.todo.on .txt .tt{color:var(--red-ink)}
+.todo.on .txt .tt{color:var(--ink-3)}
+/* 아직 안 한 학습 — 형광펜으로 그은 듯한 노란 밑줄. 해내면 밑줄이 빠지고 글자는 회색이 된다 */
+.todo:not(.on):not(.ghost) .txt .tt,.kid:not(.on):not(.note) .kt{
+  color:var(--ink);
+  background:linear-gradient(transparent 58%,rgba(255,210,0,.55) 58%,rgba(255,210,0,.55) 92%,transparent 92%);
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 2px}
 .todo .tst{flex:none;width:26px;height:26px}
 .todo .tst .st{width:26px;height:26px}
 .t-count{flex:none;font-size:var(--fs-md);color:var(--ink-3);font-variant-numeric:tabular-nums;padding:2px 0;white-space:nowrap}
 .t-count u{text-decoration:none;font-size:var(--fs-xs)}
-.todo.on .t-count{color:var(--red-ink)}
+.todo.on .t-count{color:var(--ink-3)}
 .carry{display:inline-block;margin-left:5px;padding:1px 7px;border-radius:999px;font-size:var(--fs-xs);white-space:nowrap;color:var(--amber);background:var(--amber-wash)}
 .carry.long{color:var(--coral);background:var(--coral-wash)}
+.carry.mv{color:var(--sky-strong);background:var(--sky-wash)}
+button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
+.todo.ghost .box{background:var(--bg2)!important;color:#b7c4c0}
+.todo.ghost .tt,.todo.ghost .t-count{color:#a9b7b3;text-decoration:line-through;text-decoration-color:#c9d3d0}
+.todo.ghost .subj{filter:grayscale(1);opacity:.55}
+.todo.ghost .carry.mv{color:#6f7f7b;background:#eef2f1;text-decoration:none}
 .carry.skip{color:var(--ink-3);background:var(--bg1)}
 .del{flex:none;color:var(--ink-3);width:36px;height:36px;margin:-6px -8px -6px -4px;border-radius:9px;display:grid;place-items:center}
 .del svg{width:15px;height:15px}
@@ -343,7 +354,7 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .kid{display:flex;align-items:center;gap:7px;padding:3px 0 3px 18px;font-size:var(--fs-sm);line-height:1.4}
 .kid-l{flex:none;color:var(--ink-3);width:14px}
 .kid .kt{flex:1;min-width:0;word-break:break-word}
-.kid.on .kt{color:var(--red-ink)}
+.kid.on .kt{color:var(--ink-3)}
 .kbox{flex:none;position:relative;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);background:#fff}
 .kbox::after{content:"";position:absolute;top:50%;left:50%;width:var(--tap);height:var(--tap);transform:translate(-50%,-50%)}
 .kid.on .kbox{border-color:transparent}
@@ -553,7 +564,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25m</span>
+    <span class="ver">v2026-09-25o</span>
   </footer>
 </div>
 
@@ -807,7 +818,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       .sort(function(a,b){return (a.ord||0)-(b.ord||0);});
   }
   /* 하루의 할 일 전체 — 메인 + 추가 학습(코멘트는 할 일이 아니라서 뺀다) */
-  function tasksFor(d){return state.todos.filter(function(t){return t.date===d&&!t.del&&t.kind!=="note";});}
+  function tasksFor(d){return state.todos.filter(function(t){return t.date===d&&!t.del&&!t.ghost&&t.kind!=="note";});}
   function kidsOf(id){
     return state.todos.filter(function(t){return t.parent===id&&!t.del;}).sort(function(a,b){return (a.ord||0)-(b.ord||0);});
   }
@@ -830,7 +841,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   function rollover(){
     var moved=false;
     state.todos.forEach(function(t){
-      if(!t.parent&&!t.done&&!t.del&&t.date<CUR&&!t.series&&!t.back&&!t.skip){
+      if(!t.parent&&!t.ghost&&!t.done&&!t.del&&t.date<CUR&&!t.series&&!t.back&&!t.skip){
         if(!t.origDate) t.origDate=t.date;
         t.date=CUR; t.u=Date.now(); moved=true;
       }
@@ -921,20 +932,34 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     state.todos.push(k); save(); return null;
   }
   /* 계획이 바뀌어 오늘·앞으로의 학습을 다른 날로 옮긴다 — '넘어옴' 표시는 붙이지 않는다 */
+  /* 학습 옮기기
+     · 오늘·앞으로의 학습 — 지금 날에서 빠지고, 옮긴 날에 메인 학습으로 들어간다.
+     · 지난 학습 — 원래 날에는 회색 '이동 → mm/dd' 자국이 남고(세지 않음), 옮긴 날에 메인 학습으로 들어간다.
+     옮긴 날의 학습에는 '이동 ← mm/dd' 가 붙고, 하위 학습·코멘트는 메인을 따라간다. */
+  function relocate(t,to){
+    var from=t.date;
+    if(from<CUR){
+      state.todos.push({id:newId(),date:from,subj:t.subj,text:t.text,ghost:true,movedTo:to,
+        count:t.count,unit:t.unit,by:t.by,u:Date.now(),ord:t.ord||0});
+    }
+    t.date=to; t.movedFrom=from;
+    delete t.origDate; delete t.back; delete t.skip;
+    t.ord=todosFor(to).length; t.u=Date.now();
+  }
   function moveOne(id,to){
-    var t=findTodo(id); if(!t||t.parent) return "학습을 찾지 못했어요.";
+    var t=findTodo(id); if(!t||t.parent||t.ghost) return "학습을 찾지 못했어요.";
     if(!to||to<CUR||to>END) return "오늘 이후 날짜를 골라 주세요.";
     if(to===t.date) return "지금과 같은 날이에요.";
-    t.date=to; delete t.origDate; delete t.back; delete t.skip; t.ord=todosFor(to).length; t.u=Date.now();
+    relocate(t,to);
     syncKids(); save(); return null;
   }
+  function mmdd(d){return d.slice(5,7)+"/"+d.slice(8,10);}
   function pendingOf(d){return tasksFor(d).filter(function(t){return !t.done&&!t.skip;});}
   function moveTodos(from,to){
     var n=0;
     state.todos.forEach(function(t){
-      if(t.date===from&&!t.parent&&!t.done&&!t.del&&!t.skip){
-        if(!t.origDate) t.origDate=t.date;
-        t.date=to; delete t.back; t.u=Date.now(); n++;
+      if(t.date===from&&!t.parent&&!t.ghost&&!t.done&&!t.del&&!t.skip){
+        relocate(t,to); n++;
       }
     });
     syncKids();
@@ -942,7 +967,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   }
   function skipDay(d){
     var n=0;
-    state.todos.forEach(function(t){if(t.date===d&&!t.done&&!t.del&&!t.skip){t.skip=true;t.u=Date.now();n++;}});
+    state.todos.forEach(function(t){if(t.date===d&&!t.ghost&&!t.done&&!t.del&&!t.skip){t.skip=true;t.u=Date.now();n++;}});
     if(n) save(); return n;
   }
 
@@ -973,7 +998,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     var out={};
     state.subjects.forEach(function(s){out[s.id]={done:0,total:0,min:0};});
     state.todos.forEach(function(t){
-      if(t.del||t.kind==="note"||t.date<from||t.date>CUR) return;
+      if(t.del||t.ghost||t.kind==="note"||t.date<from||t.date>CUR) return;
       var o=out[t.subj]||(out[t.subj]={done:0,total:0,min:0});
       o.total++;
       if(t.done){
@@ -1167,6 +1192,16 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     return list.map(function(t,idx){
       if(composer&&composer.editId===t.id) return editArea(t,idx,list.length);
       var S=subjOf(t.subj),badge="";
+      if(t.ghost){
+        /* 지난 날에 남은 자국 — 회색, 체크할 수 없고, 배지를 누르면 옮긴 날로 간다 */
+        return '<div class="todo ghost">'+
+          '<span class="box">'+toolIcon(S.icon)+'</span>'+
+          '<span class="txt">'+subjTag(S)+'<span class="tt">'+esc(t.text)+'</span>'+
+            '<button class="carry mv" data-open="'+t.movedTo+'">이동 → '+mmdd(t.movedTo)+'</button></span>'+
+          (t.count?'<span class="t-count">'+t.count+'<u>'+esc(t.unit||"")+'</u></span>':'')+
+          '<button class="del" data-del="'+t.id+'" aria-label="자국 지우기">'+icon("close")+'</button></div>';
+      }
+      if(t.movedFrom&&t.movedFrom!==t.date) badge+='<span class="carry mv">이동 ← '+mmdd(t.movedFrom)+'</span>';
       if(t.origDate&&!t.done){
         var late=Math.round((parse(t.date)-parse(t.origDate))/86400000);
         if(late>0) badge='<span class="carry'+(late>=7?" long":"")+'">'+late+'일 넘어옴</span>';
