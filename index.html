@@ -494,10 +494,9 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .rulefld input{flex:0 0 70px;min-width:0;height:var(--pill);font-family:inherit;font-size:16px;color:var(--ink);text-align:center;
   background:var(--field);border:2px solid var(--line);border-radius:var(--r-sm);-webkit-appearance:none;appearance:none}
 
-.gear{flex:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
-  color:var(--pulse-strong);background:var(--mint-wash);border:2px solid var(--mint)}
-.gear svg{width:24px;height:24px;transition:transform .4s var(--ease)}
-.gear.on{background:var(--pulse);border-color:var(--pulse);color:#fff}
+.gear{flex:none;width:44px;height:44px;display:grid;place-items:center;color:var(--pulse-strong);background:none;border:0}   /* 해 모양 아이콘만 */
+.gear svg{width:28px;height:28px;transition:transform .4s var(--ease)}
+.gear.on{color:var(--pulse)}
 .gear.on svg{transform:rotate(60deg)}
 .settings{display:flex;flex-direction:column;gap:8px}
 .set-head{display:flex;align-items:center;justify-content:space-between}
@@ -530,7 +529,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
 <div class="wrap">
   <header>
     <button class="plane" id="plane" aria-label="발사!"></button>
-    <h1 class="title">날아라 <em>아유</em> 보드<span class="sub">배운 만큼 한 뼘씩, 더 높이</span></h1>
+    <h1 class="title">날아라 <em>아유 보드</em><span class="sub">배운 만큼 한 뼘씩, 더 높이</span></h1>
     <button class="gear" id="gear" aria-label="설정" aria-expanded="false"></button>
   </header>
 
@@ -571,7 +570,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25s</span>
+    <span class="ver">v2026-09-25t</span>
   </footer>
 </div>
 
