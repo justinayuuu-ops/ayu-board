@@ -290,12 +290,17 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .todo.on .box .ic{opacity:.5}
 .todo .txt{flex:1;min-width:0;display:flex;align-items:center;gap:7px;text-align:left;padding:2px 0;line-height:1.4}
 .todo .txt .tt{min-width:0;word-break:break-word}
-.todo.on .txt .tt{color:var(--red-ink)}
+.todo.on .txt .tt{color:var(--ink-3)}
+/* 아직 안 한 학습 — 형광펜으로 그은 듯한 노란 밑줄. 해내면 밑줄이 빠지고 글자는 회색이 된다 */
+.todo:not(.on):not(.ghost) .txt .tt,.kid:not(.on):not(.note) .kt{
+  color:var(--ink);
+  background:linear-gradient(transparent 58%,rgba(255,210,0,.55) 58%,rgba(255,210,0,.55) 92%,transparent 92%);
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 2px}
 .todo .tst{flex:none;width:26px;height:26px}
 .todo .tst .st{width:26px;height:26px}
 .t-count{flex:none;font-size:var(--fs-md);color:var(--ink-3);font-variant-numeric:tabular-nums;padding:2px 0;white-space:nowrap}
 .t-count u{text-decoration:none;font-size:var(--fs-xs)}
-.todo.on .t-count{color:var(--red-ink)}
+.todo.on .t-count{color:var(--ink-3)}
 .carry{display:inline-block;margin-left:5px;padding:1px 7px;border-radius:999px;font-size:var(--fs-xs);white-space:nowrap;color:var(--amber);background:var(--amber-wash)}
 .carry.long{color:var(--coral);background:var(--coral-wash)}
 .carry.mv{color:var(--sky-strong);background:var(--sky-wash)}
@@ -349,7 +354,7 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .kid{display:flex;align-items:center;gap:7px;padding:3px 0 3px 18px;font-size:var(--fs-sm);line-height:1.4}
 .kid-l{flex:none;color:var(--ink-3);width:14px}
 .kid .kt{flex:1;min-width:0;word-break:break-word}
-.kid.on .kt{color:var(--red-ink)}
+.kid.on .kt{color:var(--ink-3)}
 .kbox{flex:none;position:relative;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);background:#fff}
 .kbox::after{content:"";position:absolute;top:50%;left:50%;width:var(--tap);height:var(--tap);transform:translate(-50%,-50%)}
 .kid.on .kbox{border-color:transparent}
@@ -559,7 +564,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25n</span>
+    <span class="ver">v2026-09-25o</span>
   </footer>
 </div>
 
