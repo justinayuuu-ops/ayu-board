@@ -289,6 +289,8 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 @keyframes draw{to{stroke-dashoffset:0}}
 .todo.on .box .ic{opacity:.5}
 .todo .txt{flex:1;min-width:0;display:flex;align-items:center;gap:7px;text-align:left;padding:2px 0;line-height:1.4}
+/* 내용 열 맞추기 — 메인: 도구 34 + 9 + 과목 58 + 7 = 108px, 서브: 43 + ㄴ·체크 58 + 7 = 108px */
+.todo .txt>.subj{width:58px;padding-left:2px;padding-right:2px;overflow:hidden;text-overflow:ellipsis}
 .todo .txt .tt{min-width:0;word-break:break-word}
 .todo.on .txt .tt{color:var(--ink-3)}
 /* 아직 안 한 학습 — 형광펜으로 그은 듯한 노란 밑줄. 해내면 밑줄이 빠지고 글자는 회색이 된다 */
@@ -351,8 +353,8 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
   background:var(--mint-wash);border:1.5px solid var(--mint);margin-right:2px}
 .addkid svg{width:15px;height:15px}
 .by{flex:none;display:inline-flex;align-items:center;font-size:11px;line-height:1;padding:3px 6px;border-radius:999px;color:#fff;margin-left:4px;vertical-align:1px}
-.kid{display:flex;align-items:center;gap:7px;padding:3px 0 3px 18px;font-size:var(--fs-sm);line-height:1.4}
-.kid-l{flex:none;color:var(--ink-3);width:14px}
+.kid{display:flex;align-items:center;gap:7px;padding:3px 0 3px 43px;font-size:var(--fs-sm);line-height:1.4}
+.kid-l{flex:none;color:var(--ink-3);width:29px;text-align:right}
 .kid .kt{flex:1;min-width:0;word-break:break-word;text-align:left;padding:2px 0}
 .kid.ghost .kt{color:#a9b7b3;text-decoration:line-through;text-decoration-color:#c9d3d0}
 .kid.ghost .kbox{border-color:#dfe6e4;background:var(--bg2)}
@@ -368,7 +370,7 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .kic{flex:none;width:22px;height:22px;display:grid;place-items:center;color:var(--sky-strong)}
 .kic svg{width:18px;height:18px}
 .kid .del{width:32px;height:32px}
-.kidform{margin:4px 0 8px 18px;padding:9px 10px;border-radius:var(--r-sm);background:var(--bg2);border:1.5px solid var(--line);display:flex;flex-direction:column;gap:7px}
+.kidform{margin:4px 0 8px 43px;padding:9px 10px;border-radius:var(--r-sm);background:var(--bg2);border:1.5px solid var(--line);display:flex;flex-direction:column;gap:7px}
 .kidform input{width:100%;font-family:inherit;font-size:16px;min-height:var(--tap);padding:8px 12px;color:var(--ink);background:#fff;
   border:2px solid var(--line);border-radius:var(--r-sm);-webkit-appearance:none;appearance:none}
 .kidform input:focus{outline:0;border-color:var(--pulse)}
@@ -569,7 +571,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25q</span>
+    <span class="ver">v2026-09-25r</span>
   </footer>
 </div>
 
