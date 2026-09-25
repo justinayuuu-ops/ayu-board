@@ -553,7 +553,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25l</span>
+    <span class="ver">v2026-09-25m</span>
   </footer>
 </div>
 
@@ -1341,12 +1341,8 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       '<span><i style="background:var(--amber)"></i>성장 한 줄</span>';
   }
 
-  function renderRole(){
-    var w=$("roleWrap");
-    if(getMe()||hidden("role")){w.innerHTML="";return;}
-    w.innerHTML='<div class="install"><h2>이 폰은 누가 쓰나요?</h2><p>골라 두면 학습과 코멘트에 누가 썼는지 남아요. 설정에서 언제든 바꿀 수 있어요.</p>'+
-      roleChips()+'<div class="acts"><button class="btn dismiss" id="noRole">나중에</button></div></div>';
-  }
+  /* 역할 고르기는 설정 안에만 둔다 — 첫 화면에는 따로 묻지 않는다 */
+  function renderRole(){$("roleWrap").innerHTML="";}
   function renderAll(){
     renderFlight(); renderBoard(); renderCal(); renderLegend(); renderDay(); renderBacklog(); renderGrowth();
     if(booted){renderKeep();renderInstall();renderCarry();renderRole();}
@@ -1501,7 +1497,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     var meR=roleOf(getMe());
     $("keepPanel").innerHTML=
       '<div class="sec">'+secHead("role","내 역할",meR?meR.name:"정하지 않음",meR?"":"warn")+
-        '<div class="sec-body"'+(secOpen.role?"":" hidden")+'><p>이 폰을 쓰는 사람을 골라 주세요. 학습·추가 학습·코멘트를 쓰면 이름이 함께 남아요.</p>'+roleChips()+'</div></div>'+
+        '<div class="sec-body"'+(secOpen.role?"":" hidden")+'><p><b>이 폰은 누가 쓰나요?</b> 골라 두면 학습·추가 학습·코멘트에 누가 썼는지 이름이 함께 남아요.</p>'+roleChips()+'</div></div>'+
       '<div class="sec">'+secHead("subj","과목 관리",subjects().length+"과목","")+
         '<div class="sec-body"'+(secOpen.subj?"":" hidden")+'>'+smBody+'</div></div>'+
       '<div class="sec">'+secHead("keep","기록 보관",!canStore?"저장 막힘":(stale?(bak?"백업 오래됨":"백업 없음"):"백업 "+bak),(!canStore||stale)?"warn":"")+
