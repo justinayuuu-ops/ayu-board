@@ -184,9 +184,9 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 
 /* ── 스코어보드 ── */
 .board{
-  /* 달력 격자의 빈칸과 같은 민트(--line) — 글자는 진한 색으로 */
+  /* 연한 민트 바탕 — 글자는 진한 색으로 */
   display:grid;grid-template-columns:repeat(3,1fr);
-  background:var(--line);border-radius:var(--r-md);box-shadow:var(--shadow-1);overflow:hidden;color:var(--ink);
+  background:#c6f6e3;border-radius:var(--r-md);box-shadow:var(--shadow-1);overflow:hidden;color:var(--ink);
 }
 .board .cell{padding:6px 9px 7px;border-left:1.5px solid rgba(255,255,255,.75);min-width:0}
 .board .cell:first-child{border-left:0}
@@ -570,7 +570,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25t</span>
+    <span class="ver">v2026-09-25u</span>
   </footer>
 </div>
 
@@ -1402,6 +1402,9 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       var memo=state.notes[key]&&state.notes[key].t?'<span class="memo"></span>':'';
       cells+='<button class="'+cls+'" data-open="'+key+'"'+(key===SEL?' aria-current="date"':'')+'><span class="n">'+day+(st.complete?redCircle(pop==="day:"+key):"")+'</span>'+mark+memo+'</button>';
     }
+    /* 마지막 주의 남은 칸도 앞쪽 빈칸과 같은 모양으로 채운다 — 격자 바탕이 비쳐 보이지 않게 */
+    var used=first.getDay()+dim;
+    for(var k=used%7?7-used%7:0;k>0;k--) cells+='<div class="day pad"></div>';
     $("grid").innerHTML=cells;
     $("prev").disabled=fmt(new Date(view.y,view.m,1))<=START;
     $("next").disabled=fmt(new Date(view.y,view.m,dim))>=END;
