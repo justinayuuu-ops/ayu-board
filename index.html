@@ -571,7 +571,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25v</span>
+    <span class="ver">v2026-09-25w</span>
   </footer>
 </div>
 
@@ -1122,7 +1122,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       mode:"one",from:d,to:clampDate(shift(d,27)),dows:[1,2,3,4,5],err:""};
   }
   function openEditor(t){
-    composer={date:t.date,editId:t.id,text:t.text,subj:t.subj||"etc",count:t.count?String(t.count):"",
+    composer={date:t.date,editId:t.id,newSub:null,text:t.text,subj:t.subj||"etc",count:t.count?String(t.count):"",
       unit:t.unit||"쪽",mode:"one",from:t.date,to:t.date,dows:[],err:""};
   }
   function subjChips(c){
@@ -1132,8 +1132,8 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       var on=c.subj===s.id;
       return '<button class="chip'+(on?" on":"")+'" data-subj="'+s.id+'"'+(on?' style="background:'+s.color+';border-color:'+s.color+'"':'')+'><i style="background:'+s.color+'"></i>'+esc(s.name)+'</button>';
     }).join("")+
-      (c.newSub===null?'<button class="chip addsub" data-addsub>+ 과목</button>':'')+'</div>'+
-      (c.newSub!==null?'<div class="newsub"><input type="text" id="newSubIn" data-c="newSub" value="'+esc(c.newSub)+'" maxlength="10" placeholder="예: 한문" '+INPUT_ATTRS+'>'+
+      (c.newSub==null?'<button class="chip addsub" data-addsub>+ 과목</button>':'')+'</div>'+
+      (c.newSub!=null?'<div class="newsub"><input type="text" id="newSubIn" data-c="newSub" value="'+esc(c.newSub)+'" maxlength="10" placeholder="예: 한문" '+INPUT_ATTRS+'>'+
         '<button class="btn" data-addsub-cancel>취소</button><button class="btn primary" data-addsub-save>추가</button></div>':'');
   }
   function amountRow(c){
