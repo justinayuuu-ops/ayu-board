@@ -573,7 +573,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-25x</span>
+    <span class="ver">v2026-09-25y</span>
   </footer>
 </div>
 
@@ -1192,9 +1192,9 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         '<button class="btn" data-move-one="'+t.id+'" style="flex:none">옮기기</button></div></div>'+
       (t.by?'<div class="chint">처음 작성 '+byTag(t.by)+'</div>':'')+
       (c.err?'<div class="cerr">'+esc(c.err)+'</div>':'')+
-      '<div class="cacts"><button class="btn warn" data-edit-del="'+t.id+'">삭제</button>'+
+      '<div class="cacts"><button class="btn primary" data-edit-save>저장</button>'+
       '<button class="btn" data-compose-cancel>취소</button>'+
-      '<button class="btn primary" data-edit-save>저장</button></div></div>';
+      '<button class="btn warn" data-edit-del="'+t.id+'">삭제</button></div></div>';
   }
   function previewCount(c){
     var from=c.from,to=c.to;
@@ -1291,8 +1291,8 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         '<div class="chint">옮기면 그날의 메인 학습이 돼요.</div>':'')+
       (kidEdit.err?'<div class="cerr">'+esc(kidEdit.err)+'</div>':'')+
       '<div class="kf-foot"><span class="kf-me">'+(k.by?'작성 '+byTag(k.by):'')+'</span>'+
-      '<button class="btn warn" data-kdel="'+k.id+'">삭제</button><button class="btn" data-kedit-cancel>취소</button>'+
-      '<button class="btn primary" data-kedit-save>저장</button></div></div>';
+      '<button class="btn primary" data-kedit-save>저장</button><button class="btn" data-kedit-cancel>취소</button>'+
+      '<button class="btn warn" data-kdel="'+k.id+'">삭제</button></div></div>';
   }
   function kidsHtml(t){
     var html=kidsOf(t.id).map(function(k){
