@@ -333,8 +333,8 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 
 /* 오늘의 성장 한 줄 */
 .diary{margin-top:10px;padding:9px 10px 10px;border-radius:var(--r-sm);background:#b0f1db}   /* 연속 비행 칸보다 한 단 연한 민트 */
-.diary .lb{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);color:var(--ink-2);margin-bottom:5px}
-.diary .lb svg{width:15px;height:15px}
+.diary .lb{display:flex;align-items:center;gap:5px;font-size:13px;line-height:1.6;color:var(--ink);margin:0 0 3px}
+.diary .lb svg{width:14px;height:14px;color:var(--ink-2)}
 .diary textarea{
   width:100%;min-height:62px;resize:none;border:1.5px solid #ffffff;border-radius:var(--r-sm);
   padding:8px 10px;font-size:13px;line-height:1.45;color:var(--ink);background:#ffffff;   /* 학습 목록 글자와 같게 */
@@ -589,7 +589,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-27c</span>
+    <span class="ver">v2026-09-27d</span>
   </footer>
 </div>
 
@@ -1394,7 +1394,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     html+='<div class="todos">'+todoList(d)+addArea(d)+'</div>';
     if(st.complete) html+='<div class="cheer">'+sticker("crown")+'<span>'+dayCheer(d)+'</span></div>';
     else if(d<CUR&&st.total) html+='<div class="note">지난 날의 못 한 학습은 여기서 바로 체크해도 그날 스티커가 붙어요.</div>';
-    html+='<div class="diary"><div class="lb">'+icon("pen")+'오늘의 성장 한 줄</div>'+
+    html+='<div class="diary"><div class="lb">오늘의 성장 한 줄'+icon("pen")+'</div>'+
       '<textarea data-note="'+d+'" maxlength="200" rows="2" placeholder="새로 알게 된 것, 스스로 칭찬하고 싶은 것">'+esc(note)+'</textarea>'+
       '<div class="saved" id="noteSaved"></div></div>';
     $("dayPanel").innerHTML=html;
