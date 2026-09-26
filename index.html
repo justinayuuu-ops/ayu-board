@@ -12,11 +12,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="application-name" content="날아라 아유 보드">
 <title>날아라 아유 보드</title>
-<link rel="manifest" href="./manifest.webmanifest?v=r6">
-<link rel="icon" href="./favicon-48-r6.png" sizes="48x48" type="image/png">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon-r6.png">
-<link rel="apple-touch-icon" href="./apple-touch-icon-r6.png">
-<link rel="apple-touch-icon-precomposed" href="./apple-touch-icon-r6.png">
+<link rel="manifest" href="./manifest.webmanifest?v=r7">
+<link rel="icon" href="./favicon-48-r7.png" sizes="48x48" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon-r7.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon-r7.png">
+<link rel="apple-touch-icon-precomposed" href="./apple-touch-icon-r7.png">
 <style>
 /* 주아 (Jua) · 카카오 작은글씨 — SIL Open Font License 1.1. FONT-LICENSE.txt 참고.
    앱 안의 파일을 먼저 쓰고, 없으면 CDN 으로 넘어간다. */
@@ -133,15 +133,16 @@ header .title{font-size:var(--fs-2xl);line-height:1.25;font-weight:400;color:var
 header .title em{font-style:normal;color:var(--pulse)}
 header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1px}
 .plane{
-  flex:none;width:44px;height:44px;border-radius:14px;background:#b0e2fb;border:2.5px solid #00584a;padding:0;
+  flex:none;width:44px;height:44px;border-radius:14px;background:#2ca0df;border:2.5px solid #00584a;padding:0;
   overflow:hidden;box-shadow:var(--shadow-1);display:block;
 }
-.plane img{display:block;width:100%;height:100%;object-fit:cover}
+.plane img{display:block;width:100%;height:100%;object-fit:cover;transform-origin:50% 60%}
 .plane svg{width:32px;height:32px;display:block;transform-origin:50% 50%}
 /* 이륙 — 학습을 하나 끝낼 때마다 오른쪽 위로 날아갔다가 다시 들어온다 */
 .plane{overflow:hidden}
 .plane.go img{animation:hop .6s var(--ease) both}
-@keyframes hop{0%{transform:translateY(0)}35%{transform:translateY(-5px) scale(1.06)}70%{transform:translateY(1px)}100%{transform:translateY(0)}}
+/* 칸 안에서 커졌다가 돌아오기만 한다 — 그림이 칸보다 작아지거나 밀려나지 않아 가장자리가 비치지 않는다 */
+@keyframes hop{0%{transform:scale(1)}35%{transform:scale(1.14)}65%{transform:scale(1.04)}100%{transform:scale(1)}}
 @keyframes takeoff{
   0%{transform:translate(0,0)}
   38%{transform:translate(34px,-34px)}
@@ -582,7 +583,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-26s</span>
+    <span class="ver">v2026-09-26t</span>
   </footer>
 </div>
 
