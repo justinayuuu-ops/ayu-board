@@ -310,10 +310,8 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .carry.mv{color:var(--sky-strong);background:var(--sky-wash)}
 button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .kid.ghost.gdone .kbox{border-color:var(--red);background:#fff}
-.todo.ghost.gdone .redo path{opacity:.55}
-.todo.ghost .box{background:var(--bg2)!important;color:#b7c4c0}
-.todo.ghost .tt,.todo.ghost .t-count{color:#a9b7b3;text-decoration:line-through;text-decoration-color:#c9d3d0}
-.todo.ghost .subj{filter:grayscale(1);opacity:.55}
+/* 옮긴 자국 — 글자만 연한 회색, 체크 칸은 해야 할 일처럼 그대로. 체크는 옮긴 날에서만 */
+.todo.ghost .tt,.todo.ghost .t-count{color:#b3c2be}
 .todo.ghost .carry.mv{color:#6f7f7b;background:#eef2f1;text-decoration:none}
 .carry.skip{color:var(--ink-3);background:var(--bg1)}
 .del{flex:none;color:var(--ink-3);width:28px;height:28px;margin:-4px -6px -4px -4px;border-radius:9px;display:grid;place-items:center}
@@ -362,8 +360,7 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .kid{display:flex;align-items:center;gap:3px;padding:2px 0 2px 29px;font-size:13px;line-height:1.35}
 .kid-l{flex:none;color:var(--ink-3);width:7px;font-size:10px;text-align:right}
 .kid .kt{flex:1;min-width:0;word-break:break-word;text-align:left;padding:2px 0}
-.kid.ghost .kt{color:#a9b7b3;text-decoration:line-through;text-decoration-color:#c9d3d0}
-.kid.ghost .kbox{border-color:#dfe6e4;background:var(--bg2)}
+.kid.ghost .kt{color:#b3c2be}
 .kid.ghost .carry.mv{color:#6f7f7b;background:#eef2f1}
 .kidform .dates{display:flex;align-items:center;gap:7px}
 .kidform .dates input{flex:1;min-width:0}
@@ -580,7 +577,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-26h</span>
+    <span class="ver">v2026-09-26i</span>
   </footer>
 </div>
 
@@ -1254,7 +1251,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         /* 지난 날에 남은 자국 — 회색, 체크할 수 없고, 배지를 누르면 옮긴 날로 간다 */
         var gd=isDone(t);
         return '<div class="todo ghost'+(gd?" gdone":"")+'">'+
-          '<span class="box">'+toolIcon(S.icon)+(gd?redCircle(false):"")+'</span>'+
+          '<button class="box" data-ghost="'+t.movedTo+'" style="color:'+S.color+';background:'+wash(S.color)+'" aria-label="'+mmdd(t.movedTo)+'에서 체크할 수 있어요">'+toolIcon(S.icon)+(gd?redCircle(false):"")+'</button>'+
           '<span class="txt">'+subjMini(S)+'<span class="tt">'+esc(t.text)+'</span>'+
             '<button class="carry mv" data-open="'+t.movedTo+'">이동 → '+mmdd(t.movedTo)+'</button></span>'+
           (t.count?'<span class="t-count">'+t.count+'<u>'+esc(t.unit||"")+'</u></span>':'')+
@@ -1337,7 +1334,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       if(kidEdit&&kidEdit.id===k.id) return kidEditArea(k);
       if(k.ghost){
         var kgd=isDone(k);
-        return '<div class="kid ghost'+(kgd?" gdone":"")+'"><span class="kid-l">ㄴ</span><span class="kbox">'+(kgd?'<svg class="vchk" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 8.4l3 3.1 6.6-7.2"/></svg>':'')+'</span>'+
+        return '<div class="kid ghost'+(kgd?" gdone":"")+'"><span class="kid-l">ㄴ</span><button class="kbox" data-ghost="'+k.movedTo+'" aria-label="'+mmdd(k.movedTo)+'에서 체크할 수 있어요">'+(kgd?'<svg class="vchk" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 8.4l3 3.1 6.6-7.2"/></svg>':'')+'</button>'+
           '<span class="kt">'+esc(k.text)+'</span>'+
           '<button class="carry mv" data-open="'+k.movedTo+'">이동 → '+mmdd(k.movedTo)+'</button>'+
           '<button class="del" data-del="'+k.id+'" aria-label="자국 지우기">'+icon("close")+'</button></div>';
@@ -1787,6 +1784,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       if(me2){toast(me2);return;}
       composer=null; renderAll(); toast(label(mto)+"로 옮겼어요.");return;
     }
+    if((el=up(e.target,"[data-ghost]"))){toast(mmdd(el.getAttribute("data-ghost"))+"로 옮긴 학습이에요. 그날에서 체크하면 여기도 함께 체크돼요.");return;}
     if((el=up(e.target,"[data-todo]"))){
       var id=el.getAttribute("data-todo"),t0=findTodo(id),was=t0?isComplete(t0.date):false;
       toggleTodo(id);
