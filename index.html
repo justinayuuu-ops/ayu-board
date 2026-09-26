@@ -245,7 +245,8 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px 1px;overflow:hidden;outline:none!important}
 .day.pad,.day.out{background:var(--bg2)}
 .day.out{opacity:.5}
-.day .n{font-size:var(--fs-sm);line-height:1;font-variant-numeric:tabular-nums}
+.day .n{font-size:var(--fs-sm);line-height:1;font-variant-numeric:tabular-nums;
+  flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:7px}   /* 모든 날 같은 상자 — 고른 날도 점 높이가 그대로 */
 .day.sun .n{color:var(--coral)}
 .day.sat .n{color:var(--sky)}
 .day.missed .n{color:var(--ink-3)}
@@ -454,10 +455,10 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .btn.dismiss{flex:0 0 auto;min-width:var(--tap);color:var(--ink-3);border-color:transparent;background:none;box-shadow:none}
 
 /* ── 밀린 학습 ── */
-.backlog{background:var(--amber-wash);border:2px solid #ffd35c;border-radius:var(--r-md);padding:10px 12px 9px}
-.backlog h2{font-size:var(--fs-md);font-weight:400;color:var(--amber);margin:0 0 1px}
+.backlog{background:#b0f1db;border:0;border-radius:var(--r-md);padding:10px 12px 9px}
+.backlog h2{font-size:var(--fs-md);font-weight:400;color:var(--pulse-strong);margin:0 0 1px}
 .backlog p{font-size:var(--fs-sm);color:var(--ink-2);margin:0 0 6px}
-.bl{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid #ffe7a3;min-height:40px;flex-wrap:wrap}
+.bl{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid rgba(255,255,255,.7);min-height:40px;flex-wrap:wrap}
 .bl .d{flex:none;min-width:64px;font-size:var(--fs-sm);font-variant-numeric:tabular-nums}
 .bl .w{flex:1 1 80px;min-width:0;font-size:var(--fs-xs);color:var(--ink-3)}
 .blacts{display:flex;gap:6px;flex:none}
@@ -528,7 +529,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
 @media (max-width:359px){
   .wrap{padding-left:calc(12px + var(--safe-l));padding-right:calc(12px + var(--safe-r))}
   .board .cell{padding:6px 6px 7px}
-  .day.today .n,.day.sel .n{width:21px;height:21px;border-radius:7px}
+  .day .n{width:21px;height:21px}
   .g-row{grid-template-columns:56px 1fr auto}
   .g-num{min-width:60px}
 }
@@ -583,7 +584,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-26t</span>
+    <span class="ver">v2026-09-27a</span>
   </footer>
 </div>
 
@@ -2000,7 +2001,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   try{if(navigator.storage&&navigator.storage.persist) navigator.storage.persist();}catch(e){}
 
   /* ---------- 시작 ---------- */
-  $("plane").innerHTML='<img src="./ayu-avatar-r3.png" alt="" width="44" height="44">';   /* 앱 화면 제목 옆 — 아유 */
+  $("plane").innerHTML='<img src="./ayu-avatar-r4.png" alt="" width="44" height="44">';   /* 앱 화면 제목 옆 — 아유 */
   $("gear").innerHTML=icon("gear");
   $("setClose").innerHTML=icon("close");
   $("prev").innerHTML=icon("left");
