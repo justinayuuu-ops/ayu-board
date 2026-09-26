@@ -133,13 +133,15 @@ header .title{font-size:var(--fs-2xl);line-height:1.25;font-weight:400;color:var
 header .title em{font-style:normal;color:var(--pulse)}
 header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1px}
 .plane{
-  flex:none;width:44px;height:44px;border-radius:14px;background:var(--pulse);border:2.5px solid #00584a;
-  display:grid;place-items:center;box-shadow:var(--shadow-1);color:#fff;
+  flex:none;width:44px;height:44px;border-radius:14px;background:#b0e2fb;border:2.5px solid #00584a;padding:0;
+  overflow:hidden;box-shadow:var(--shadow-1);display:block;
 }
+.plane img{display:block;width:100%;height:100%;object-fit:cover}
 .plane svg{width:32px;height:32px;display:block;transform-origin:50% 50%}
 /* 이륙 — 학습을 하나 끝낼 때마다 오른쪽 위로 날아갔다가 다시 들어온다 */
 .plane{overflow:hidden}
-.plane.go svg{animation:takeoff .9s var(--ease) both}
+.plane.go img{animation:hop .6s var(--ease) both}
+@keyframes hop{0%{transform:translateY(0)}35%{transform:translateY(-5px) scale(1.06)}70%{transform:translateY(1px)}100%{transform:translateY(0)}}
 @keyframes takeoff{
   0%{transform:translate(0,0)}
   38%{transform:translate(34px,-34px)}
@@ -538,7 +540,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
 
 <div class="wrap">
   <header>
-    <button class="plane" id="plane" aria-label="발사!"></button>
+    <button class="plane" id="plane" aria-label="아유"></button>
     <h1 class="title">날아라 <em>아유 보드</em><span class="sub">배운 만큼 한 뼘씩, 더 높이</span></h1>
     <button class="gear" id="gear" aria-label="설정" aria-expanded="false"></button>
   </header>
@@ -580,7 +582,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-26p</span>
+    <span class="ver">v2026-09-26o</span>
   </footer>
 </div>
 
@@ -1997,7 +1999,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   try{if(navigator.storage&&navigator.storage.persist) navigator.storage.persist();}catch(e){}
 
   /* ---------- 시작 ---------- */
-  $("plane").innerHTML=planeSvg();
+  $("plane").innerHTML='<img src="./ayu-avatar-r1.png" alt="" width="44" height="44">';   /* 앱 화면 제목 옆 — 아유 */
   $("gear").innerHTML=icon("gear");
   $("setClose").innerHTML=icon("close");
   $("prev").innerHTML=icon("left");
