@@ -239,7 +239,7 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);
   border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
 .day{background:var(--surface);aspect-ratio:1/1;min-height:44px;position:relative;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:1px;overflow:hidden;outline:none!important}
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px 1px;overflow:hidden;outline:none!important}
 .day.pad,.day.out{background:var(--bg2)}
 .day.out{opacity:.5}
 .day .n{font-size:var(--fs-sm);line-height:1;font-variant-numeric:tabular-nums}
@@ -250,10 +250,11 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .dots{display:flex;gap:2px;margin-top:3px;height:5px}
 .dots i{width:5px;height:5px;border-radius:50%;opacity:.35}
 .dots i.on{opacity:1}
-.day .dst{width:15px;height:15px}
-.day .dst .st{width:15px;height:15px}
+/* 다 해낸 날 스티커 — 숫자 상자 22 + 사이 2 + 스티커 13 = 37px, 가장 작은 칸(44px)에도 여유 있게 들어간다 */
+.day .dst{width:13px;height:13px;flex:none;margin-top:1px}
+.day .dst .st{width:13px;height:13px}
 .day .memo{position:absolute;top:3px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--amber)}
-.day.today .n,.day.sel .n,.day.full .n{flex:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.day.today .n,.day.sel .n,.day.full .n{flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:7px}
 .day.today .n{background:var(--pulse);color:#fff}
 .day .n{position:relative}
 .day.sel .n{box-shadow:inset 0 0 0 2.5px var(--sky)}
@@ -579,7 +580,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-26m</span>
+    <span class="ver">v2026-09-26n</span>
   </footer>
 </div>
 
