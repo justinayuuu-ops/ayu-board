@@ -577,7 +577,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-26j</span>
+    <span class="ver">v2026-09-26k</span>
   </footer>
 </div>
 
@@ -942,7 +942,14 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     if(t.done) t.doneDate=CUR; else delete t.doneDate;
     t.u=Date.now(); save();
   }
-  function delTodo(id){var t=findTodo(id); if(t){t.del=true;t.u=Date.now();syncKids();save();}}
+  function delTodo(id){var t=findTodo(id); if(t){t.del=true;t.u=Date.now();syncKids();tombstones();save();}}
+  /* 지운 학습은 '지움' 표시만 남기고 내용은 비운다 — 어디로 넘어가도 다시 살아나지 않고, 저장 공간도 아낀다 */
+  function tombstones(){
+    state.todos.forEach(function(t){
+      if(!t.del) return;
+      for(var k in t) if(k!=="id"&&k!=="del"&&k!=="u"&&k!=="date"&&k!=="parent") delete t[k];
+    });
+  }
   /* 메인 학습 밑에 추가 학습(kind:task) 또는 코멘트(kind:note)를 단다 */
   function addKid(pid,kind,text){
     var p=findTodo(pid); text=(text||"").trim();
@@ -1550,7 +1557,8 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       if(!t||!t.id||!t.date) return;
       var mine=byId[t.id];
       if(!mine){state.todos.push(t);n++;}
-      else if((t.u||0)>(mine.u||0)){for(var k0 in mine) if(!(k0 in t)) delete mine[k0]; for(var k in t) mine[k]=t[k]; n++;}   /* 통째로 바꾼다 — 한쪽에서 지운 칸이 되살아나지 않게 */
+      else if(mine.del&&!t.del){}   /* 지운 기록은 무조건 지운 채로 — 다른 폰의 옛 사본이 되살리지 못하게 */
+      else if((t.del&&!mine.del)||(t.u||0)>(mine.u||0)){for(var k0 in mine) if(!(k0 in t)) delete mine[k0]; for(var k in t) mine[k]=t[k]; n++;}   /* 통째로 바꾼다 — 한쪽에서 지운 칸이 되살아나지 않게 */
     });
     Object.keys(rem.notes||{}).forEach(function(d){
       var a=state.notes[d],b=rem.notes[d];
@@ -1647,8 +1655,8 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   /* 서버에 없는(또는 서버보다 새로운) 기록이 이 폰에 있는지 */
   function remoteBehind(rem){
     if(!rem) return true;
-    var m={}; (rem.todos||[]).forEach(function(t){if(t&&t.id) m[t.id]=t.u||0;});
-    for(var i=0;i<state.todos.length;i++){var t=state.todos[i]; if(!(t.id in m)||(t.u||0)>m[t.id]) return true;}
+    var m={},rd={}; (rem.todos||[]).forEach(function(t){if(t&&t.id){m[t.id]=t.u||0; if(t.del) rd[t.id]=1;}});
+    for(var i=0;i<state.todos.length;i++){var t=state.todos[i]; if(!(t.id in m)||(t.u||0)>m[t.id]||(t.del&&!rd[t.id])) return true;}
     var rn=rem.notes||{};
     for(var d in state.notes){if(!rn[d]||(state.notes[d].u||0)>(rn[d].u||0)) return true;}
     var rs={}; (rem.subjects||[]).forEach(function(x){if(x&&x.id) rs[x.id]=x.u||0;});
