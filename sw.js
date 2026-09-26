@@ -3,7 +3,7 @@
    아이콘·글꼴은 캐시 우선: 인터넷이 없어도 앱이 그대로 뜬다.
    학습 기록은 캐시가 아니라 localStorage 에 있으므로 캐시를 비워도 사라지지 않는다. */
 
-var VERSION = "ayuboard-2026-09-26i";
+var VERSION = "ayuboard-2026-09-26j";
 var PREFIX = "ayuboard-";
 var SHELL = PREFIX + "shell-" + VERSION;
 
@@ -11,13 +11,14 @@ var SHELL_FILES = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./apple-touch-icon.png",
+  "./manifest.webmanifest?v=r2",
+  "./apple-touch-icon-r2.png",
   "./apple-touch-icon-precomposed.png",
-  "./icon-180.png",
-  "./icon-192.png",
-  "./icon-512.png",
-  "./icon-maskable-512.png",
-  "./favicon-48.png",
+  "./icon-180-r2.png",
+  "./icon-192-r2.png",
+  "./icon-512-r2.png",
+  "./icon-maskable-512-r2.png",
+  "./favicon-48-r2.png",
   "./Jua-Korean.woff2",
   "./KakaoSmallSans-Regular.woff2",
   "./KakaoSmallSans-Bold.woff2"
@@ -82,5 +83,7 @@ self.addEventListener("fetch", function (e) {
   try { url = new URL(req.url); } catch (err) { return; }
   if (url.origin !== self.location.origin) return;   /* 함께 보기(Firebase) 요청은 그대로 통과 */
   if (req.mode === "navigate") { e.respondWith(networkFirst(req)); return; }
+  /* 아이콘·매니페스트는 늘 새것을 먼저 — 아이콘을 바꿔도 예전 그림이 남지 않게 */
+  if (/\.(png|webmanifest)$/.test(url.pathname)) { e.respondWith(networkFirst(req)); return; }
   e.respondWith(cacheFirst(req));
 });
