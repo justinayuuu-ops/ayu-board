@@ -12,11 +12,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="application-name" content="날아라 아유 보드">
 <title>날아라 아유 보드</title>
-<link rel="manifest" href="./manifest.webmanifest?v=r2">
-<link rel="icon" href="./favicon-48-r2.png" sizes="48x48" type="image/png">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon-r2.png">
-<link rel="apple-touch-icon" href="./apple-touch-icon-r2.png">
-<link rel="apple-touch-icon-precomposed" href="./apple-touch-icon-r2.png">
+<link rel="manifest" href="./manifest.webmanifest?v=r4">
+<link rel="icon" href="./favicon-48-r4.png" sizes="48x48" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon-r4.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon-r4.png">
+<link rel="apple-touch-icon-precomposed" href="./apple-touch-icon-r4.png">
 <style>
 /* 주아 (Jua) · 카카오 작은글씨 — SIL Open Font License 1.1. FONT-LICENSE.txt 참고.
    앱 안의 파일을 먼저 쓰고, 없으면 CDN 으로 넘어간다. */
@@ -133,13 +133,15 @@ header .title{font-size:var(--fs-2xl);line-height:1.25;font-weight:400;color:var
 header .title em{font-style:normal;color:var(--pulse)}
 header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1px}
 .plane{
-  flex:none;width:44px;height:44px;border-radius:14px;background:var(--pulse);border:2.5px solid #00584a;
-  display:grid;place-items:center;box-shadow:var(--shadow-1);color:#fff;
+  flex:none;width:44px;height:44px;border-radius:14px;background:#b0e2fb;border:2.5px solid #00584a;padding:0;
+  overflow:hidden;box-shadow:var(--shadow-1);display:block;
 }
+.plane img{display:block;width:100%;height:100%;object-fit:cover}
 .plane svg{width:32px;height:32px;display:block;transform-origin:50% 50%}
 /* 이륙 — 학습을 하나 끝낼 때마다 오른쪽 위로 날아갔다가 다시 들어온다 */
 .plane{overflow:hidden}
-.plane.go svg{animation:takeoff .9s var(--ease) both}
+.plane.go img{animation:hop .6s var(--ease) both}
+@keyframes hop{0%{transform:translateY(0)}35%{transform:translateY(-5px) scale(1.06)}70%{transform:translateY(1px)}100%{transform:translateY(0)}}
 @keyframes takeoff{
   0%{transform:translate(0,0)}
   38%{transform:translate(34px,-34px)}
@@ -239,7 +241,7 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);
   border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
 .day{background:var(--surface);aspect-ratio:1/1;min-height:44px;position:relative;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:1px;overflow:hidden;outline:none!important}
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px 1px;overflow:hidden;outline:none!important}
 .day.pad,.day.out{background:var(--bg2)}
 .day.out{opacity:.5}
 .day .n{font-size:var(--fs-sm);line-height:1;font-variant-numeric:tabular-nums}
@@ -250,15 +252,18 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .dots{display:flex;gap:2px;margin-top:3px;height:5px}
 .dots i{width:5px;height:5px;border-radius:50%;opacity:.35}
 .dots i.on{opacity:1}
-.day .dst{width:15px;height:15px}
-.day .dst .st{width:15px;height:15px}
+/* 다 해낸 날 스티커 — 숫자 상자 22 + 사이 2 + 스티커 13 = 37px, 가장 작은 칸(44px)에도 여유 있게 들어간다 */
+.day .dst{width:13px;height:13px;flex:none;margin-top:1px}
+.day .dst .st{width:13px;height:13px}
 .day .memo{position:absolute;top:3px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--amber)}
-.day.today .n,.day.sel .n{flex:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.day.today .n,.day.sel .n,.day.full .n{flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:7px}
 .day.today .n{background:var(--pulse);color:#fff}
 .day .n{position:relative}
-.day .n .redo{width:34px;height:34px;margin:-17px 0 0 -17px}
-.day .n .redo path{stroke-width:2.3}
 .day.sel .n{box-shadow:inset 0 0 0 2.5px var(--sky)}
+/* 다 해낸 날 — 날짜 숫자 네모 테두리만 빨간펜으로 (선이 겹치지 않게 한 줄만).
+   고른 날이면서 다 해낸 날은 테두리는 빨강, 고른 표시는 칸 바탕(하늘색)으로 */
+.day.full .n,.day.full.sel .n{box-shadow:inset 0 0 0 2px var(--red)}
+.day.full.sel{background:var(--sky-wash)}
 .cal-leg{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:8px;font-size:var(--fs-xs);color:var(--ink-3)}
 .cal-leg span{display:inline-flex;align-items:center;gap:4px}
 .cal-leg i{width:7px;height:7px;border-radius:50%;display:inline-block}
@@ -535,7 +540,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
 
 <div class="wrap">
   <header>
-    <button class="plane" id="plane" aria-label="발사!"></button>
+    <button class="plane" id="plane" aria-label="아유"></button>
     <h1 class="title">날아라 <em>아유 보드</em><span class="sub">배운 만큼 한 뼘씩, 더 높이</span></h1>
     <button class="gear" id="gear" aria-label="설정" aria-expanded="false"></button>
   </header>
@@ -577,7 +582,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-26k</span>
+    <span class="ver">v2026-09-26o</span>
   </footer>
 </div>
 
@@ -1446,7 +1451,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         }).join("")+'</span>';
       }
       var memo=state.notes[key]&&state.notes[key].t?'<span class="memo"></span>':'';
-      cells+='<button class="'+cls+'" data-open="'+key+'"'+(key===SEL?' aria-current="date"':'')+'><span class="n">'+day+(st.complete?redCircle(pop==="day:"+key):"")+'</span>'+mark+memo+'</button>';
+      cells+='<button class="'+cls+'" data-open="'+key+'"'+(key===SEL?' aria-current="date"':'')+'><span class="n">'+day+'</span>'+mark+memo+'</button>';
     }
     /* 마지막 주의 남은 칸도 앞쪽 빈칸과 같은 모양으로 채운다 — 격자 바탕이 비쳐 보이지 않게 */
     var used=first.getDay()+dim;
@@ -1994,7 +1999,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   try{if(navigator.storage&&navigator.storage.persist) navigator.storage.persist();}catch(e){}
 
   /* ---------- 시작 ---------- */
-  $("plane").innerHTML=planeSvg();
+  $("plane").innerHTML='<img src="./ayu-avatar-r1.png" alt="" width="44" height="44">';   /* 앱 화면 제목 옆 — 아유 */
   $("gear").innerHTML=icon("gear");
   $("setClose").innerHTML=icon("close");
   $("prev").innerHTML=icon("left");
