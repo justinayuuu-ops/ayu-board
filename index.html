@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#ffffff">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
@@ -328,11 +328,11 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .diary .lb svg{width:15px;height:15px}
 .diary textarea{
   width:100%;min-height:62px;resize:none;border:1.5px solid #ffffff;border-radius:var(--r-sm);
-  padding:8px 10px;font-size:16px;line-height:1.45;color:var(--ink);background:#ffffff;
+  padding:8px 10px;font-size:13px;line-height:1.45;color:var(--ink);background:#ffffff;   /* 학습 목록 글자와 같게 */
   -webkit-appearance:none;appearance:none;font-family:inherit;
 }
 .diary textarea:focus{outline:0;border-color:var(--pulse)}
-/* 안내 문구만 작게 — 입력 글자는 16px 유지(더 작으면 아이폰이 화면을 확대한다) */
+/* 안내 문구는 조금 더 작게 */
 .diary textarea::placeholder{font-size:var(--fs-xs);color:var(--ink-3)}
 .diary .saved{font-size:var(--fs-xs);color:var(--ink-2);margin-top:3px;min-height:1em}
 
@@ -578,7 +578,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-26e</span>
+    <span class="ver">v2026-09-26f</span>
   </footer>
 </div>
 
