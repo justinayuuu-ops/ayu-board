@@ -3,7 +3,7 @@
    아이콘·글꼴은 캐시 우선: 인터넷이 없어도 앱이 그대로 뜬다.
    학습 기록은 캐시가 아니라 localStorage 에 있으므로 캐시를 비워도 사라지지 않는다. */
 
-var VERSION = "ayuboard-2026-09-26k";
+var VERSION = "ayuboard-2026-09-26l";
 var PREFIX = "ayuboard-";
 var SHELL = PREFIX + "shell-" + VERSION;
 
@@ -11,14 +11,14 @@ var SHELL_FILES = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./manifest.webmanifest?v=r2",
-  "./apple-touch-icon-r2.png",
+  "./manifest.webmanifest?v=r3",
+  "./apple-touch-icon-r3.png",
   "./apple-touch-icon-precomposed.png",
-  "./icon-180-r2.png",
-  "./icon-192-r2.png",
-  "./icon-512-r2.png",
-  "./icon-maskable-512-r2.png",
-  "./favicon-48-r2.png",
+  "./icon-180-r3.png",
+  "./icon-192-r3.png",
+  "./icon-512-r3.png",
+  "./icon-maskable-512-r3.png",
+  "./favicon-48-r3.png",
   "./Jua-Korean.woff2",
   "./KakaoSmallSans-Regular.woff2",
   "./KakaoSmallSans-Bold.woff2"
