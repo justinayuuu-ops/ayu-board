@@ -582,7 +582,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-26q</span>
+    <span class="ver">v2026-09-26r</span>
   </footer>
 </div>
 
@@ -1277,7 +1277,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       if(t.skip&&!t.done) badge+='<span class="carry skip">건너뜀</span>';
       return '<div class="todo'+(t.done?" on":"")+'">'+
         '<button class="box" style="color:'+S.color+';background:'+wash(S.color)+'" data-todo="'+t.id+'" aria-label="'+(t.done?"완료 취소":"완료 표시")+'">'+toolIcon(S.icon)+(t.done?redCircle(pop==="t:"+t.id||pop==="day:"+t.date):"")+'</button>'+
-        '<button class="txt" data-edit="'+t.id+'">'+subjMini(S)+'<span class="tt">'+esc(t.text)+badge+'</span>'+byTag(t.by)+'</button>'+
+        '<button class="txt" data-edit="'+t.id+'">'+subjMini(S)+'<span class="tt">'+esc(t.text)+'</span>'+byTag(t.by)+badge+'</button>'+
         (t.count?'<button class="t-count" data-edit="'+t.id+'">'+t.count+'<u>'+esc(t.unit||"")+'</u></button>':'')+
         '<button class="addkid" data-addkid="'+t.id+'" aria-label="추가 학습·코멘트 달기">'+icon("plus")+'</button>'+
         '<button class="del" data-del="'+t.id+'" aria-label="삭제">'+icon("close")+'</button></div>'+
