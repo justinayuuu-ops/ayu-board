@@ -1,6 +1,8 @@
 #!/bin/bash
 # 날아라 아유 보드 — 더블클릭하면 바뀐 파일을 깃헙에 커밋하고 푸시한 뒤, 결과를 알려 준다.
 cd "$(dirname "$0")" || exit 1
+# 이전 작업이 남긴 빈 잠금 파일 정리 (git 이 돌고 있지 않을 때만)
+if ! pgrep -x git >/dev/null; then rm -f .git/HEAD.lock .git/index.lock .git/objects/maintenance.lock; fi
 REPO="https://github.com/justinayuuu-ops/ayu-board"
 SITE="https://justinayuuu-ops.github.io/ayu-board/"
 
