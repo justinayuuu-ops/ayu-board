@@ -3,7 +3,7 @@
    아이콘·글꼴은 캐시 우선: 인터넷이 없어도 앱이 그대로 뜬다.
    학습 기록은 캐시가 아니라 localStorage 에 있으므로 캐시를 비워도 사라지지 않는다. */
 
-var VERSION = "ayuboard-2026-09-26f";
+var VERSION = "ayuboard-2026-09-26g";
 var PREFIX = "ayuboard-";
 var SHELL = PREFIX + "shell-" + VERSION;
 

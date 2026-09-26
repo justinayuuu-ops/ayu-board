@@ -309,6 +309,8 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .carry.long{color:var(--coral);background:var(--coral-wash)}
 .carry.mv{color:var(--sky-strong);background:var(--sky-wash)}
 button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
+.kid.ghost.gdone .kbox{border-color:var(--red);background:#fff}
+.todo.ghost.gdone .redo path{opacity:.55}
 .todo.ghost .box{background:var(--bg2)!important;color:#b7c4c0}
 .todo.ghost .tt,.todo.ghost .t-count{color:#a9b7b3;text-decoration:line-through;text-decoration-color:#c9d3d0}
 .todo.ghost .subj{filter:grayscale(1);opacity:.55}
@@ -578,7 +580,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-26f</span>
+    <span class="ver">v2026-09-26g</span>
   </footer>
 </div>
 
@@ -834,7 +836,14 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       .sort(function(a,b){return (a.ord||0)-(b.ord||0);});
   }
   /* 하루의 할 일 전체 — 메인 + 추가 학습(코멘트는 할 일이 아니라서 뺀다) */
-  function tasksFor(d){return state.todos.filter(function(t){return t.date===d&&!t.del&&!t.ghost&&t.kind!=="note";});}
+  /* 하루의 할 일 — 메인 + 추가 학습 + 이 날에서 옮겨 간 학습의 자국(옮긴 곳에서 해내면 이 날도 해낸 것으로 친다) */
+  function tasksFor(d){return state.todos.filter(function(t){return t.date===d&&!t.del&&t.kind!=="note"&&(!t.ghost||t.srcId);});}
+  function isDone(t){
+    if(!t.ghost) return !!t.done;
+    var seen={},x=t;
+    while(x&&x.ghost&&x.srcId&&!seen[x.id]){seen[x.id]=1;x=findTodo(x.srcId);}   /* 여러 번 옮겨도 마지막 자리까지 따라간다 */
+    return !!(x&&!x.ghost&&!x.del&&x.done);
+  }
   function kidsOf(id){
     return state.todos.filter(function(t){return t.parent===id&&!t.del;}).sort(function(a,b){return (a.ord||0)-(b.ord||0);});
   }
@@ -868,7 +877,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
 
   function dayStat(d){
     var list=tasksFor(d),n=0,subs={};
-    list.forEach(function(t){if(t.done)n++; var s=subs[t.subj]||(subs[t.subj]={total:0,done:0}); s.total++; if(t.done)s.done++;});
+    list.forEach(function(t){var dn=isDone(t); if(dn)n++; var s=subs[t.subj]||(subs[t.subj]={total:0,done:0}); s.total++; if(dn)s.done++;});
     return {total:list.length,done:n,complete:list.length>0&&n===list.length,subs:subs};
   }
   function isComplete(d){return dayStat(d).complete;}
@@ -955,7 +964,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   function relocate(t,to){
     var from=t.date;
     if(from<CUR){
-      state.todos.push({id:newId(),date:from,subj:t.subj,text:t.text,ghost:true,movedTo:to,
+      state.todos.push({id:newId(),date:from,subj:t.subj,text:t.text,ghost:true,movedTo:to,srcId:t.id,
         count:t.count,unit:t.unit,by:t.by,u:Date.now(),ord:t.ord||0});
     }
     t.date=to; t.movedFrom=from;
@@ -974,15 +983,36 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     if(!to||to<CUR||to>END) return "오늘 이후 날짜를 골라 주세요.";
     var from=k.date;
     if(from<CUR){
-      state.todos.push({id:newId(),date:from,subj:k.subj,text:k.text,parent:k.parent,kind:"task",ghost:true,movedTo:to,
+      state.todos.push({id:newId(),date:from,subj:k.subj,text:k.text,parent:k.parent,kind:"task",ghost:true,movedTo:to,srcId:k.id,
         by:k.by,u:Date.now(),ord:k.ord||0});
     }
     delete k.parent; delete k.kind;
     k.date=to; k.movedFrom=from; k.ord=todosFor(to).length; k.u=Date.now();
     save(); return null;
   }
+  /* 옛 방식으로 저장된 자국 이어 주기 + 합치기 오류로 제자리에 돌아온 서브 학습 바로잡기 */
+  function repairMoves(){
+    var ch=false;
+    state.todos.forEach(function(g){
+      if(!g.ghost||g.del) return;
+      if(!g.srcId){
+        var src=null;
+        state.todos.forEach(function(t){
+          if(src||t.ghost||t.del||t.text!==g.text||t.movedFrom!==g.date) return;
+          if(t.date===g.movedTo||(g.parent&&t.parent===g.parent)) src=t;
+        });
+        if(src){g.srcId=src.id;g.u=Date.now();ch=true;}
+      }
+      var t=g.srcId&&findTodo(g.srcId);
+      /* 옮긴 서브 학습이 아직 부모 밑(옛 날짜)에 붙어 있으면 옮긴 날의 메인 학습으로 되돌려 놓는다 */
+      if(t&&g.parent&&t.parent===g.parent&&!t.ghost&&!t.del&&t.date===g.date){
+        delete t.parent; delete t.kind; t.date=g.movedTo; t.movedFrom=g.date; t.ord=todosFor(g.movedTo).length; t.u=Date.now(); ch=true;
+      }
+    });
+    return ch;
+  }
   function mmdd(d){return d.slice(5,7)+"/"+d.slice(8,10);}
-  function pendingOf(d){return tasksFor(d).filter(function(t){return !t.done&&!t.skip;});}
+  function pendingOf(d){return tasksFor(d).filter(function(t){return !t.ghost&&!t.done&&!t.skip;});}   /* 옮겨 간 것은 밀린 학습에 올리지 않는다 */
   function moveTodos(from,to){
     var n=0;
     state.todos.forEach(function(t){
@@ -1222,8 +1252,9 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       var S=subjOf(t.subj),badge="";
       if(t.ghost){
         /* 지난 날에 남은 자국 — 회색, 체크할 수 없고, 배지를 누르면 옮긴 날로 간다 */
-        return '<div class="todo ghost">'+
-          '<span class="box">'+toolIcon(S.icon)+'</span>'+
+        var gd=isDone(t);
+        return '<div class="todo ghost'+(gd?" gdone":"")+'">'+
+          '<span class="box">'+toolIcon(S.icon)+(gd?redCircle(false):"")+'</span>'+
           '<span class="txt">'+subjMini(S)+'<span class="tt">'+esc(t.text)+'</span>'+
             '<button class="carry mv" data-open="'+t.movedTo+'">이동 → '+mmdd(t.movedTo)+'</button></span>'+
           (t.count?'<span class="t-count">'+t.count+'<u>'+esc(t.unit||"")+'</u></span>':'')+
@@ -1305,7 +1336,8 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     var html=kidsOf(t.id).map(function(k){
       if(kidEdit&&kidEdit.id===k.id) return kidEditArea(k);
       if(k.ghost){
-        return '<div class="kid ghost"><span class="kid-l">ㄴ</span><span class="kbox"></span>'+
+        var kgd=isDone(k);
+        return '<div class="kid ghost'+(kgd?" gdone":"")+'"><span class="kid-l">ㄴ</span><span class="kbox">'+(kgd?'<svg class="vchk" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 8.4l3 3.1 6.6-7.2"/></svg>':'')+'</span>'+
           '<span class="kt">'+esc(k.text)+'</span>'+
           '<button class="carry mv" data-open="'+k.movedTo+'">이동 → '+mmdd(k.movedTo)+'</button>'+
           '<button class="del" data-del="'+k.id+'" aria-label="자국 지우기">'+icon("close")+'</button></div>';
@@ -1521,7 +1553,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       if(!t||!t.id||!t.date) return;
       var mine=byId[t.id];
       if(!mine){state.todos.push(t);n++;}
-      else if((t.u||0)>(mine.u||0)){for(var k in t) mine[k]=t[k]; if(!t.skip) delete mine.skip; n++;}
+      else if((t.u||0)>(mine.u||0)){for(var k0 in mine) if(!(k0 in t)) delete mine[k0]; for(var k in t) mine[k]=t[k]; n++;}   /* 통째로 바꾼다 — 한쪽에서 지운 칸이 되살아나지 않게 */
     });
     Object.keys(rem.notes||{}).forEach(function(d){
       var a=state.notes[d],b=rem.notes[d];
@@ -1627,6 +1659,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     return (state.ruleAt||0)>(rem.ruleAt||0);
   }
   function afterMerge(changed){
+    if(repairMoves()) changed=true;
     if(changed){saveQuiet();rollover();lastStreak=null;renderAll();lastStreak=streak();}
     else if(booted) renderKeep();
   }
@@ -1960,6 +1993,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   $("setClose").innerHTML=icon("close");
   $("prev").innerHTML=icon("left");
   $("next").innerHTML=icon("right");
+  if(repairMoves()) save();
   rollover();
   booted=true;
   loadSync();
