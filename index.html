@@ -448,6 +448,28 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .chint{font-size:var(--fs-xs);color:var(--ink-3)}
 .cacts{display:flex;gap:8px}
 .cacts .btn{flex:1}
+/* 학습 추가·고치기 창 — 학습명(13px)에 맞춘 작은 밸런스 (확대 막힘 설정이 있어 16px 미만 입력칸도 화면이 커지지 않는다) */
+.composer{gap:8px;padding:10px 10px 11px}
+.composer .fld .lb{font-size:11px;margin-bottom:3px}
+.composer input{font-size:13px;min-height:36px;padding:6px 10px}
+.composer input[type=number]{height:30px}
+.composer .chips{gap:5px}
+.composer .chip{min-height:28px;padding:0 10px;font-size:12px}
+.composer .chips.sub .chip,.composer .chips.sugg .chip{min-height:26px;padding:0 9px;font-size:11px}
+.composer .chips.subjs .chip{gap:4px}
+.composer .chips.subjs .chip i{width:7px;height:7px}
+.composer .chips.dows .chip{padding:0}
+.composer .newsub{gap:6px;margin-top:6px}
+.composer .newsub .btn{min-height:36px}
+.composer .btn{min-height:38px;font-size:13px;padding:0 12px}
+.composer .btn svg{width:15px;height:15px}
+.composer .cerr,.composer .chint,.composer .ordhint{font-size:11px}
+.composer .row2 .fld.num{flex:0 0 84px}
+/* 추가 학습·코멘트 창도 같은 크기 */
+.kidform input{font-size:13px;min-height:36px;padding:6px 10px}
+.kidform .chip{min-height:28px;padding:0 10px;font-size:12px}
+.kidform .btn{min-height:36px;font-size:13px;padding:0 12px}
+.kidform .chint,.kidform .cerr,.kf-me{font-size:11px}
 
 .btn{flex:1 1 140px;min-height:var(--tap);padding:0 14px;border-radius:var(--r-sm);display:inline-flex;align-items:center;justify-content:center;gap:7px;
   font-size:var(--fs-sm);border:1.5px solid var(--line);background:var(--surface);color:var(--ink-2);box-shadow:var(--shadow-1)}
@@ -612,7 +634,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-27g</span>
+    <span class="ver">v2026-09-27h</span>
   </footer>
 </div>
 
