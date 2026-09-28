@@ -248,7 +248,7 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .day.pad,.day.out{background:var(--bg2)}
 .day.out{opacity:.5}
 .day .n{font-size:var(--fs-sm);line-height:1;font-variant-numeric:tabular-nums;
-  flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:7px}   /* 모든 날 같은 상자 — 고른 날도 점 높이가 그대로 */
+  flex:none;width:25px;height:25px;display:flex;align-items:center;justify-content:center;border-radius:8px}   /* 모든 날 같은 상자 — 고른 날도 점 높이가 그대로 */
 .day.sun .n{color:var(--coral)}
 .day.sat .n{color:var(--sky)}
 .day.missed .n{color:var(--ink-3)}
@@ -256,11 +256,10 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
 .dots{display:flex;gap:2px;margin-top:3px;height:5px}
 .dots i{width:5px;height:5px;border-radius:50%;opacity:.35}
 .dots i.on{opacity:1}
-/* 다 해낸 날 스티커 — 숫자 상자 22 + 사이 2 + 스티커 13 = 37px, 가장 작은 칸(44px)에도 여유 있게 들어간다 */
-.day .dst{width:13px;height:13px;flex:none;margin-top:1px}
+/* 다 해낸 날 스티커 — 위아래 여백 4 + 숫자 상자 25 + 사이 1 + 스티커 13 = 43px, 가장 작은 칸(44px)에도 잘리지 않는다 */
+.day .dst{width:13px;height:13px;flex:none;margin-top:0}
 .day .dst .st{width:13px;height:13px}
-.day .memo{position:absolute;top:3px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--amber)}
-.day.today .n,.day.sel .n,.day.full .n{flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:7px}
+.day.today .n,.day.sel .n,.day.full .n{flex:none;width:25px;height:25px;display:flex;align-items:center;justify-content:center;border-radius:8px}
 .day.today .n{background:var(--pulse);color:#fff}
 .day .n{position:relative}
 .day.sel .n{box-shadow:inset 0 0 0 2.5px var(--sky)}
@@ -602,7 +601,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
 @media (max-width:359px){
   .wrap{padding-left:calc(12px + var(--safe-l));padding-right:calc(12px + var(--safe-r))}
   .board .cell{padding:6px 6px 7px}
-  .day .n{width:21px;height:21px}
+  .day .n,.day.today .n,.day.sel .n,.day.full .n{width:22px;height:22px}
   .g-num{min-width:60px}
 }
 @media (min-width:720px){.wrap{max-width:600px;padding-top:32px}}
@@ -656,7 +655,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-28b</span>
+    <span class="ver">v2026-09-28c</span>
   </footer>
 </div>
 
@@ -1606,8 +1605,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
           return '<i class="'+(o.done===o.total?"on":"")+'" style="background:'+s.color+'"></i>';
         }).join("")+'</span>';
       }
-      var memo=state.notes[key]&&state.notes[key].t?'<span class="memo"></span>':'';
-      cells+='<button class="'+cls+'" data-open="'+key+'"'+(key===SEL?' aria-current="date"':'')+'><span class="n">'+day+'</span>'+mark+memo+'</button>';
+      cells+='<button class="'+cls+'" data-open="'+key+'"'+(key===SEL?' aria-current="date"':'')+'><span class="n">'+day+'</span>'+mark+'</button>';
     }
     /* 마지막 주의 남은 칸도 앞쪽 빈칸과 같은 모양으로 채운다 — 격자 바탕이 비쳐 보이지 않게 */
     var used=first.getDay()+dim;
@@ -1621,8 +1619,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     /* 이번 달에 나온 과목만 보여 준다 */
     var pre=view.y+"-"+(view.m<9?"0":"")+(view.m+1)+"-",seen={},list=[];
     state.todos.forEach(function(t){if(!t.del&&t.date.indexOf(pre)===0&&!seen[t.subj]){seen[t.subj]=1;list.push(subjOf(t.subj));}});
-    $("calLeg").innerHTML=list.map(function(s){return '<span><i style="background:'+s.color+'"></i>'+esc(s.name)+'</span>';}).join("")+
-      '<span><i style="background:var(--amber)"></i>성장 한 줄</span>';
+    $("calLeg").innerHTML=list.map(function(s){return '<span><i style="background:'+s.color+'"></i>'+esc(s.name)+'</span>';}).join("");
   }
 
   /* 역할 고르기는 설정 안에만 둔다 — 첫 화면에는 따로 묻지 않는다 */
