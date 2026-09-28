@@ -400,6 +400,11 @@ input::placeholder,textarea::placeholder{font-size:inherit!important;font-family
 .composer{margin-top:8px;padding:11px 11px 12px;border-radius:var(--r-md);background:var(--bg2);
   border:1.5px solid var(--line);display:flex;flex-direction:column;gap:9px}
 .composer.edit{margin:4px 0 6px}
+.askrow{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:2px 0 6px 29px;padding:7px 9px;border-radius:var(--r-sm);
+  background:var(--amber-wash);font-size:12px;color:var(--ink-2)}
+.askrow .chip{min-height:28px;font-size:12px;padding:0 10px}
+.askrow .chip.warn{color:var(--coral);border-color:var(--coral)}
+.askrow .chip.plain{color:var(--ink-3);border-color:transparent;background:none}
 .todo.editing .txt .tt{text-decoration:underline;text-decoration-color:var(--pulse);text-decoration-thickness:1.5px;text-underline-offset:3px}   /* 지금 고치는 학습 */
 .fld{display:block;min-width:0}
 .fld .lb{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-bottom:4px}
@@ -651,7 +656,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-27n</span>
+    <span class="ver">v2026-09-28a</span>
   </footer>
 </div>
 
@@ -1016,6 +1021,34 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     if(t.done) t.doneDate=CUR; else delete t.doneDate;
     t.u=Date.now(); save();
   }
+  /* 같은 반복으로 만든 학습을 한꺼번에 지운다 — 이미 해낸 것은 기록이라 남긴다(지금 누른 것은 지운다) */
+  function delSeries(id){
+    var t0=findTodo(id); if(!t0||!t0.series) return 0;
+    var n=0;
+    state.todos.forEach(function(t){
+      if(t.series===t0.series&&!t.del&&!t.ghost&&(!t.done||t.id===id)){t.del=true;t.u=Date.now();n++;}
+    });
+    syncKids(); tombstones(); save(); return n;
+  }
+  /* 고친 학습을 기간 안의 고른 요일마다 만든다 — 고치고 있는 그 날짜는 빼고 */
+  function spreadRange(c,t){
+    var from=c.from||t.date,to=c.to||t.date;
+    if(from>to){var sw=from;from=to;to=sw;}
+    from=clampDate(from);to=clampDate(to);
+    var out=[],d=from,g=0;
+    while(d<=to&&g++<500){if(d!==t.date&&c.dows.indexOf(parse(d).getDay())>=0) out.push(d);d=shift(d,1);}
+    return out;
+  }
+  function spreadTodo(id,c){
+    var t=findTodo(id); if(!t) return {n:0,err:"학습을 찾지 못했어요."};
+    if(!c.dows.length) return {n:0,err:"요일을 하나 이상 골라 주세요."};
+    var days=spreadRange(c,t);
+    if(!days.length) return {n:0,err:"그 기간에는 새로 만들 날이 없어요."};
+    var sid=t.series||("s"+Date.now().toString(36));
+    t.series=sid; t.u=Date.now();
+    days.forEach(function(d){pushTodo(d,{subj:t.subj,text:t.text,count:t.count,unit:t.unit},sid);});
+    save(); return {n:days.length};
+  }
   function delTodo(id){var t=findTodo(id); if(t){t.del=true;t.u=Date.now();syncKids();tombstones();save();}}
   /* 지운 학습은 '지움' 표시만 남기고 내용은 비운다 — 어디로 넘어가도 다시 살아나지 않고, 저장 공간도 아낀다 */
   function tombstones(){
@@ -1053,7 +1086,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     var t=findTodo(id); if(!t||t.parent||t.ghost) return "학습을 찾지 못했어요.";
     if(!to||to<CUR||to>END) return "오늘 이후 날짜를 골라 주세요.";
     if(to===t.date) return "지금과 같은 날이에요.";
-    relocate(t,to);
+    relocate(t,to); delete t.series;   /* 이 날짜 건만 옮긴다 — '전체 반복 지우기'에도 딸려 가지 않게 */
     syncKids(); save(); return null;
   }
   function moveKid(id,to){
@@ -1249,8 +1282,9 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   }
   function openEditor(t){
     composer={date:t.date,editId:t.id,newSub:null,text:t.text,subj:t.subj||"etc",count:t.count?String(t.count):"",
-      unit:t.unit||"쪽",mode:"one",from:t.date,to:t.date,dows:[],err:""};
+      unit:t.unit||"쪽",mode:"one",from:t.date,to:clampDate(shift(t.date,27)),dows:[1,2,3,4,5],err:""};
   }
+
   function subjChips(c){
     var list=subjects();
     if(!list.some(function(x){return x.id===c.subj;})) list=list.concat([subjOf(c.subj)]);
@@ -1307,6 +1341,18 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       '<div class="fld"><span class="lb">과목</span>'+subjChips(c)+'</div>'+
       '<div class="fld"><span class="lb">학습</span><input type="text" data-c="text" value="'+esc(c.text)+'" maxlength="60" '+INPUT_ATTRS+'></div>'+
       amountRow(c)+
+      '<div class="fld"><span class="lb">반복</span><div class="chips">'+
+        '<button class="chip'+(c.mode==="one"?" on":"")+'" data-mode="one">이 날짜만</button>'+
+        '<button class="chip'+(c.mode==="range"?" on":"")+'" data-mode="range">기간 반복</button>'+
+        (t.series?'<span class="ordhint">반복으로 만든 학습</span>':'')+'</div></div>'+
+      (c.mode==="range"?
+        '<div class="fld"><span class="lb">기간</span><div class="dates">'+
+          '<input type="date" data-c="from" value="'+c.from+'" min="'+START+'" max="'+END+'" aria-label="시작일">'+
+          '<span class="tilde">~</span>'+
+          '<input type="date" data-c="to" value="'+c.to+'" min="'+START+'" max="'+END+'" aria-label="종료일"></div></div>'+
+        '<div class="fld"><span class="lb">이 요일마다</span><div class="chips dows">'+
+          DOW.map(function(n,i){return '<button class="chip'+(i===0?" sun":"")+(c.dows.indexOf(i)>=0?" on":"")+'" data-dow="'+i+'">'+n+'</button>';}).join("")+
+        '</div></div><div class="chint">'+previewCount(c)+'</div>':'')+
       (total>1?'<div class="fld"><span class="lb">순서</span><div class="chips">'+
         '<button class="chip" data-shift="-1"'+(idx===0?" disabled":"")+'>위로</button>'+
         '<button class="chip" data-shift="1"'+(idx===total-1?" disabled":"")+'>아래로</button>'+
@@ -1321,6 +1367,14 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       '<button class="btn warn" data-edit-del="'+t.id+'">삭제</button></div></div>';
   }
   function previewCount(c){
+    if(c.editId){
+      var et=findTodo(c.editId);
+      if(et){
+        if(!c.dows.length) return "요일을 하나 이상 골라 주세요.";
+        var m=spreadRange(c,et).length;
+        return m?("이 날짜는 그대로 두고 학습 "+m+"개를 더 만들어요."):"그 기간에는 새로 만들 날이 없어요.";
+      }
+    }
     var from=c.from,to=c.to;
     if(!from||!to) return "";
     if(from>to){var sw=from;from=to;to=sw;}
@@ -1359,12 +1413,17 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         (t.count?'<button class="t-count" data-edit="'+t.id+'">'+t.count+'<u>'+esc(t.unit||"")+'</u></button>':'')+
         '<button class="addkid" data-addkid="'+t.id+'" aria-label="추가 학습·코멘트 달기">'+icon("plus")+'</button>'+
         '<button class="del" data-del="'+t.id+'" aria-label="삭제">'+icon("close")+'</button></div>'+
+        (delAsk===t.id?'<div class="askrow">반복으로 만든 학습이에요. 어디까지 지울까요?'+
+          '<button class="chip" data-delone="'+t.id+'">이 날짜만</button>'+
+          '<button class="chip warn" data-delall="'+t.id+'">전체 반복</button>'+
+          '<button class="chip plain" data-delno>취소</button></div>':'')+
         (editing?editArea(t,idx,list.length):'')+
         kidsHtml(t);
     }).join("");
   }
 
   /* 학습 목록 보기 — 하루(기본: 오늘) · 이번 주 · 이번 달 · 기간 */
+  var delAsk=null;   /* 지울 범위를 묻고 있는 반복 학습 */
   var listMode="day", listFrom=null, listTo=null;
   function weekStart(d){var p=parse(d);return shift(d,-((p.getDay()+6)%7));}
   function modeRange(){
@@ -1902,7 +1961,20 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       if(t&&t.done){flyPlane();pop=(isComplete(t.date)&&!was)?("day:"+t.date):("t:"+id);}
       renderAll();return;
     }
-    if((el=up(e.target,"[data-del]"))){delTodo(el.getAttribute("data-del"));renderAll();toast("학습을 지웠어요.");return;}
+    if((el=up(e.target,"[data-del]"))){
+      var did=el.getAttribute("data-del"),dt=findTodo(did);
+      if(dt&&dt.series&&!dt.ghost&&!dt.parent){delAsk=(delAsk===did)?null:did;renderDay();return;}   /* 반복 학습이면 어디까지 지울지 먼저 묻는다 */
+      delTodo(did);renderAll();toast("학습을 지웠어요.");return;
+    }
+    if((el=up(e.target,"[data-delone]"))){
+      var d1=el.getAttribute("data-delone");delTodo(d1);delAsk=null;if(composer&&composer.editId===d1)composer=null;
+      renderAll();toast("이 날짜의 학습만 지웠어요.");return;
+    }
+    if((el=up(e.target,"[data-delall]"))){
+      var da=el.getAttribute("data-delall"),dn=delSeries(da);delAsk=null;if(composer&&composer.editId===da)composer=null;
+      renderAll();toast("반복 학습 "+dn+"개를 지웠어요. 이미 해낸 기록은 그대로예요.");return;
+    }
+    if(up(e.target,"[data-delno]")){delAsk=null;renderDay();return;}
     if((el=up(e.target,"[data-edit]"))){
       var eid=el.getAttribute("data-edit");
       if(composer&&composer.editId===eid){composer=null;renderDay();return;}   /* 같은 학습명을 다시 누르면 닫힌다 */
@@ -1946,11 +2018,22 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         toast(r.n>1?("학습 "+r.n+"개를 만들었어요."):"학습을 추가했어요.");return;
       }
       if(up(e.target,"[data-edit-save]")){
+        if(composer.mode==="range"&&!composer.dows.length){composer.err="요일을 하나 이상 골라 주세요.";renderDay();return;}
         var er=updateTodo(composer);
         if(er){composer.err=er;renderDay();return;}
-        composer=null;renderAll();toast("학습을 고쳤어요.");return;
+        var more=0;
+        if(composer.mode==="range"){
+          var sr=spreadTodo(composer.editId,composer);
+          if(sr.err){composer.err=sr.err;renderDay();return;}
+          more=sr.n;
+        }
+        composer=null;renderAll();toast(more?("학습을 고치고 "+more+"개를 더 만들었어요."):"학습을 고쳤어요.");return;
       }
-      if((el=up(e.target,"[data-edit-del]"))){delTodo(el.getAttribute("data-edit-del"));composer=null;renderAll();toast("학습을 지웠어요.");return;}
+      if((el=up(e.target,"[data-edit-del]"))){
+        var ed=el.getAttribute("data-edit-del"),edt=findTodo(ed);
+        if(edt&&edt.series){delAsk=(delAsk===ed)?null:ed;renderDay();return;}
+        delTodo(ed);composer=null;renderAll();toast("학습을 지웠어요.");return;
+      }
     }
 
     /* 밀린 학습 — 학습마다 채우기·옮기기·건너뛰기 */
