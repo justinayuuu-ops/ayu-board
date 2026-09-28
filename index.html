@@ -332,12 +332,12 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .addbtn svg{width:17px;height:17px}
 
 /* 오늘의 성장 한 줄 */
-.diary{margin-top:10px;padding:9px 10px 10px;border-radius:var(--r-sm);background:var(--pulse-wash)}   /* 과목별 성장·밀린 학습과 같은 연한 민트 */
-.diary .lb{display:flex;align-items:center;gap:5px;font-size:13px;line-height:1.6;color:var(--ink);margin:0 0 3px}
+.diary{margin-top:10px;padding:6px 10px 7px;border-radius:var(--r-sm);background:var(--pulse-wash)}   /* 과목별 성장·밀린 학습과 같은 연한 민트 */
+.diary .lb{display:flex;align-items:center;gap:5px;font-size:13px;line-height:1.4;color:var(--ink);margin:0 0 4px}
 .diary .lb svg{width:14px;height:14px;color:var(--ink-2)}
 .diary textarea{
-  width:100%;min-height:62px;resize:none;border:1.5px solid #ffffff;border-radius:var(--r-sm);
-  padding:8px 10px;font-size:13px;line-height:1.45;color:var(--ink);background:#ffffff;   /* 학습 목록 글자와 같게 */
+  width:100%;min-height:31px;height:31px;resize:none;overflow:hidden;display:block;border:1.5px solid #ffffff;border-radius:var(--r-sm);
+  padding:6px 10px;font-size:13px;line-height:1.45;color:var(--ink);background:#ffffff;   /* 학습 목록 글자와 같게 */
   -webkit-appearance:none;appearance:none;font-family:inherit;
 }
 .diary textarea:focus{outline:0;border-color:var(--pulse)}
@@ -345,7 +345,7 @@ button.carry.mv{font:inherit;font-size:var(--fs-xs);border:0;cursor:pointer}
 .diary textarea::placeholder{font-size:inherit;color:var(--ink-3)}
 /* 예시 글자는 어디서나 입력하는 글자와 같은 크기 */
 input::placeholder,textarea::placeholder{font-size:inherit!important;font-family:inherit}
-.diary .saved{font-size:var(--fs-xs);color:var(--ink-2);margin-top:3px;min-height:1em}
+.diary .saved{margin-left:auto;font-size:11px;color:var(--ink-2)}   /* 제목 줄 오른쪽 — 따로 줄을 차지하지 않는다 */
 
 .cheer{display:flex;align-items:center;gap:8px;margin-top:9px;padding:8px 10px;background:var(--pulse-wash);
   border-radius:var(--r-sm);font-size:var(--fs-md);color:var(--pulse-strong)}
@@ -656,7 +656,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-28a</span>
+    <span class="ver">v2026-09-28b</span>
   </footer>
 </div>
 
@@ -1525,10 +1525,10 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     html+='<div class="todos">'+todoList(d)+addArea(d)+'</div>';
     if(st.complete) html+='<div class="cheer">'+sticker("crown")+'<span>'+dayCheer(d)+'</span></div>';
     else if(d<CUR&&st.total) html+='<div class="note">지난 날의 못 한 학습은 여기서 바로 체크해도 그날 스티커가 붙어요.</div>';
-    html+='<div class="diary"><div class="lb">오늘의 성장 한 줄'+icon("pen")+'</div>'+
-      '<textarea data-note="'+d+'" maxlength="200" rows="2" placeholder="새로 알게 된 것, 스스로 칭찬하고 싶은 것">'+esc(note)+'</textarea>'+
-      '<div class="saved" id="noteSaved"></div></div>';
-    $("dayPanel").innerHTML=html;
+    html+='<div class="diary"><div class="lb">오늘의 성장 한 줄'+icon("pen")+'<span class="saved" id="noteSaved"></span></div>'+
+      '<textarea data-note="'+d+'" maxlength="200" rows="1" placeholder="새로 알게 된 것, 스스로 칭찬하고 싶은 것">'+esc(note)+'</textarea>'+
+      '</div>';
+    $("dayPanel").innerHTML=html; fitNote();
   }
 
   function selectDay(d,scroll){
@@ -2118,6 +2118,8 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
 
   /* 글자 입력은 상태에만 담는다 — 다시 그리지 않아 키보드가 닫히지 않는다 */
   var noteTimer=null;
+  /* 성장 한 줄 칸 — 평소엔 한 줄, 길게 쓰면 쓴 만큼 늘어난다 */
+  function fitNote(n){n=n||document.querySelector(".diary textarea");if(!n)return;n.style.height="auto";n.style.height=Math.max(31,n.scrollHeight+3)+"px";}
   function bindField(e){
     var kx=up(e.target,"[data-ke]");
     if(kx&&kidEdit){kidEdit.text=kx.value;kidEdit.err="";return;}
@@ -2126,6 +2128,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     var n=up(e.target,"[data-note]");
     if(n){
       var d=n.getAttribute("data-note"),v=n.value;
+      fitNote(n);
       clearTimeout(noteTimer);
       noteTimer=setTimeout(function(){
         if(v.trim()) state.notes[d]={t:v,u:Date.now()}; else state.notes[d]={t:"",u:Date.now()};
