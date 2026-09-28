@@ -267,6 +267,19 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
    고른 날이면서 다 해낸 날은 테두리는 빨강, 고른 표시는 칸 바탕(하늘색)으로 */
 .day.full .n,.day.full.sel .n{box-shadow:inset 0 0 0 2px var(--red)}
 .day.full.sel{background:var(--sky-wash)}
+/* ── 달력 숫자 자리 고정 (도아 셈과 같은 방식) ──
+   숫자 상자와 아래 표시(점·완료 스티커)를 칸 안에 각각 못 박아 둔다 — 어떤 상태든 숫자는 같은 높이.
+   주아 글꼴은 숫자가 위로 떠 보여서(아래 여백이 2px 더 넓음) 상자 높이를 23px로 줄이고 숫자를 1px 내려 위아래 여백을 맞춘다. */
+.day .n,.day.today .n,.day.sel .n,.day.full .n{
+  position:absolute;top:5px;left:calc(50% - 12.5px);width:25px;height:23px;padding-top:2px;box-sizing:border-box}
+.dots{position:absolute;top:32px;left:0;right:0;justify-content:center;margin:0}   /* 숫자 상자 아래 4px */
+/* 다 해낸 날 — 숫자 테두리는 없애고, 비어 있던 숫자 아래 자리까지 써서 스티커를 크게 */
+.day.full .n,.day.full.sel .n{box-shadow:none}
+.day .dst{position:absolute;top:25px;left:calc(50% - 8.5px);width:17px;height:17px;margin:0}
+.day .dst .st{width:17px;height:17px}
+/* 오늘이면서 다 해낸 날 — 오늘 상자가 채워져 있으니 스티커는 상자 아래로 조금 작게 */
+.day.today.full .dst{top:29px;left:calc(50% - 6.5px);width:13px;height:13px}
+.day.today.full .dst .st{width:13px;height:13px}
 .cal-leg{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:8px;font-size:var(--fs-xs);color:var(--ink-3)}
 .cal-leg span{display:inline-flex;align-items:center;gap:4px}
 .cal-leg i{width:7px;height:7px;border-radius:50%;display:inline-block}
@@ -601,7 +614,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
 @media (max-width:359px){
   .wrap{padding-left:calc(12px + var(--safe-l));padding-right:calc(12px + var(--safe-r))}
   .board .cell{padding:6px 6px 7px}
-  .day .n,.day.today .n,.day.sel .n,.day.full .n{width:22px;height:22px}
+  .day .n,.day.today .n,.day.sel .n,.day.full .n{width:23px;left:calc(50% - 11.5px)}
   .g-num{min-width:60px}
 }
 @media (min-width:720px){.wrap{max-width:600px;padding-top:32px}}
@@ -655,7 +668,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-28c</span>
+    <span class="ver">v2026-09-28d</span>
   </footer>
 </div>
 
