@@ -398,7 +398,7 @@ input::placeholder,textarea::placeholder{font-size:inherit!important;font-family
 .kbox .redo{width:26px;height:26px;margin:-13px 0 0 -13px}
 .kid.note .kt{color:var(--ink-2)}
 .kic{flex:none;width:16px;height:16px;display:grid;place-items:center;color:var(--sky-strong)}
-.kic svg{width:14px;height:14px}
+.kic svg{width:15px;height:15px;stroke-width:2.1;overflow:visible}   /* 작은 크기에서도 또렷하게 */
 .kid .del{width:26px;height:26px}
 .kidform{margin:4px 0 8px 29px;padding:9px 10px;border-radius:var(--r-sm);background:var(--bg2);border:1.5px solid var(--line);display:flex;flex-direction:column;gap:7px}
 .kidform input{width:100%;font-family:inherit;font-size:16px;min-height:var(--tap);padding:8px 12px;color:var(--ink);background:#fff;
@@ -668,7 +668,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-28d</span>
+    <span class="ver">v2026-09-28e</span>
   </footer>
 </div>
 
@@ -796,7 +796,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       up:'<path d="M12 20.5v-12M7 13l5-5 5 5M4.5 4h15"/>',
       plus:'<path d="M12 5v14M5 12h14"/>',
       chev:'<path d="M6 9.5l6 6 6-6"/>',
-      chat:'<path d="M4.5 5.5h15a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V16.5h-1A1.5 1.5 0 0 1 3 15V7a1.5 1.5 0 0 1 1.5-1.5z"/>',
+      chat:'<path d="M12 4.2c4.8 0 8.6 3.1 8.6 7s-3.8 7-8.6 7c-1.1 0-2.1-.15-3.1-.45L4.8 19.6l1.2-3.6C4.3 14.7 3.4 13 3.4 11.2c0-3.9 3.8-7 8.6-7z"/>',   /* 둥근 말풍선 */
       gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/><circle cx="12" cy="12" r="6.6"/>',
       pen:'<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 7l3 3"/>',
       link:'<path d="M10.2 13.8a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.3 1.3"/><path d="M13.8 10.2a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.3-1.3"/>',
