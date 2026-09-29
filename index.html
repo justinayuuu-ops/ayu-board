@@ -448,6 +448,14 @@ input::placeholder,textarea::placeholder{font-size:inherit!important;font-family
 .composer{margin-top:8px;padding:11px 11px 12px;border-radius:var(--r-md);background:var(--bg2);
   border:1.5px solid var(--line);display:flex;flex-direction:column;gap:9px}
 .composer.edit{margin:4px 0 6px}
+.alog{margin-top:2px;padding:6px 8px;border-radius:var(--r-sm);background:#fff;border:1px solid var(--line-soft);font-size:11px;color:var(--ink-3)}
+.alog-t{display:block;font-size:11px;color:var(--ink-2);margin-bottom:2px}
+.alog-r{display:flex;flex-wrap:wrap;gap:0 7px;line-height:1.6}
+.alog-r b{font-weight:400;color:var(--ink)}
+.devrow{display:flex;align-items:center;gap:6px;margin-top:8px}
+.devrow .lb{flex:none;font-size:13px;color:var(--ink-2)}
+.devrow input{flex:1;min-width:0;font-family:inherit;font-size:13px;height:34px;padding:0 10px;color:var(--ink);background:var(--field);border:2px solid var(--line);border-radius:var(--r-sm);-webkit-appearance:none;appearance:none}
+.devrow .devid{flex:none;font-size:11px;color:var(--ink-3)}
 .askrow{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:2px 0 6px 29px;padding:7px 9px;border-radius:var(--r-sm);
   background:var(--amber-wash);font-size:12px;color:var(--ink-2)}
 .askrow .chip{min-height:28px;font-size:12px;padding:0 10px}
@@ -704,7 +712,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-29d</span>
+    <span class="ver">v2026-09-29e</span>
   </footer>
 </div>
 
@@ -764,6 +772,33 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   var ME_KEY=KEY+":me";
   function getMe(){var v=readKey(ME_KEY);return ROLES.some(function(r){return r.id===v;})?v:null;}
   function roleOf(id){for(var i=0;i<ROLES.length;i++) if(ROLES[i].id===id) return ROLES[i];return null;}
+  var DEV_KEY=KEY+":dev";
+  function devInfo(){
+    var o=null; try{o=JSON.parse(readKey(DEV_KEY)||"null");}catch(e){}
+    if(!o||!o.id){
+      var ua=(navigator.userAgent||""),kind=/iPad/.test(ua)?"iPad":/iPhone/.test(ua)?"iPhone":/Android/.test(ua)?"안드로이드":/Mac/.test(ua)?"Mac":/Windows/.test(ua)?"PC":"기기";
+      o={id:Math.random().toString(36).slice(2,6),kind:kind,name:""};
+      writeKey(DEV_KEY,JSON.stringify(o));
+    }
+    return o;
+  }
+  function devLabel(){var o=devInfo();return (o.name||o.kind)+"·"+o.id;}
+  /* 학습마다 최근 기록 6개 — [무엇, 누가(역할), 어느 폰, 언제] */
+  function logAct(t,what){
+    if(!t) return;
+    var h=Array.isArray(t.h)?t.h.slice():[];
+    h.push([what,getMe()||"",devLabel(),Date.now()]);
+    if(h.length>6) h=h.slice(-6);
+    t.h=h; t.ed=getMe()||""; t.dv=devLabel();
+  }
+  function whenShort(ms){var d=new Date(ms);return (d.getMonth()+1)+"/"+d.getDate()+" "+d.getHours()+":"+(d.getMinutes()<10?"0":"")+d.getMinutes();}
+  function logHtml(t){
+    if(!t||!Array.isArray(t.h)||!t.h.length) return "";
+    return '<div class="alog"><span class="alog-t">기록</span>'+t.h.slice().reverse().map(function(r){
+      var ro=roleOf(r[1]);
+      return '<div class="alog-r"><b>'+esc(r[0])+'</b><span>'+(ro?ro.name:"역할 없음")+'</span><span>'+esc(r[2])+'</span><span>'+whenShort(r[3])+'</span></div>';
+    }).join("")+'</div>';
+  }
   function byTag(id){var r=roleOf(id);return r?'<span class="by" style="background:'+r.color+'">'+r.name+'</span>':'';}
   function roleChips(){
     var me=getMe();
@@ -1056,7 +1091,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     t.text=text; t.subj=c.subj;
     kidsOf(t.id).forEach(function(k){if(k.subj!==c.subj){k.subj=c.subj;k.u=Date.now();}});
     if(cnt>0){t.count=cnt;t.unit=c.unit;}else{delete t.count;delete t.unit;}
-    t.u=Date.now(); save(); return null;
+    logAct(t,"고침"); t.u=Date.now(); save(); return null;
   }
   function moveTodo(id,dir){
     var me=findTodo(id); if(!me) return false;
@@ -1071,6 +1106,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     var t=findTodo(id); if(!t) return;
     t.done=!t.done; delete t.skip;
     if(t.done) t.doneDate=CUR; else delete t.doneDate;
+    logAct(t,t.done?"체크":"체크 취소");
     t.u=Date.now(); save();
   }
   /* 같은 반복으로 만든 학습을 한꺼번에 지운다 — 이미 해낸 것은 기록이라 남긴다(지금 누른 것은 지운다) */
@@ -1101,12 +1137,12 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     days.forEach(function(d){pushTodo(d,{subj:t.subj,text:t.text,count:t.count,unit:t.unit},sid);});
     save(); return {n:days.length};
   }
-  function delTodo(id){var t=findTodo(id); if(t){t.del=true;t.u=Date.now();syncKids();tombstones();save();}}
+  function delTodo(id){var t=findTodo(id); if(t){logAct(t,"지움");t.del=true;t.u=Date.now();syncKids();tombstones();save();}}
   /* 지운 학습은 '지움' 표시만 남기고 내용은 비운다 — 어디로 넘어가도 다시 살아나지 않고, 저장 공간도 아낀다 */
   function tombstones(){
     state.todos.forEach(function(t){
       if(!t.del) return;
-      for(var k in t) if(k!=="id"&&k!=="del"&&k!=="u"&&k!=="date"&&k!=="parent") delete t[k];
+      for(var k in t) if(k!=="id"&&k!=="del"&&k!=="u"&&k!=="date"&&k!=="parent"&&k!=="h"&&k!=="ed"&&k!=="dv") delete t[k];   /* 누가·어느 폰에서 지웠는지는 남긴다 */
     });
   }
   /* 메인 학습 밑에 추가 학습(kind:task) 또는 코멘트(kind:note)를 단다 */
@@ -1132,7 +1168,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     }
     t.date=to; t.movedFrom=from;
     delete t.origDate; delete t.back; delete t.skip;
-    t.ord=todosFor(to).length; t.u=Date.now();
+    t.ord=todosFor(to).length; logAct(t,"옮김 "+mmdd(from)+"→"+mmdd(to)); t.u=Date.now();
   }
   function moveOne(id,to){
     var t=findTodo(id); if(!t||t.parent||t.ghost) return "학습을 찾지 못했어요.";
@@ -1150,7 +1186,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         by:k.by,u:Date.now(),ord:k.ord||0});
     }
     delete k.parent; delete k.kind;
-    k.date=to; k.movedFrom=from; k.ord=todosFor(to).length; k.u=Date.now();
+    k.date=to; k.movedFrom=from; k.ord=todosFor(to).length; logAct(k,"옮김 "+mmdd(from)+"→"+mmdd(to)); k.u=Date.now();
     save(); return null;
   }
   /* 옛 방식으로 저장된 자국 이어 주기 + 합치기 오류로 제자리에 돌아온 서브 학습 바로잡기 */
@@ -1160,7 +1196,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       if(!FIX[t.id]||t.done||t.del||(t.u||0)>FIX[t.id]) return;
       var g=null; state.todos.forEach(function(x){if(x.ghost&&!x.del&&x.srcId===t.id) g=x;});
       if(!g||!g.movedTo) return;
-      t.date=g.movedTo; t.done=true; t.doneDate=g.movedTo; delete t.origDate; t.u=Date.now(); ch=true;
+      t.date=g.movedTo; t.done=true; t.doneDate=g.movedTo; delete t.origDate; logAct(t,"되살림(넘기기 오류)"); t.u=Date.now(); ch=true;
     });
     return ch;
   }
@@ -1226,7 +1262,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   /* 밀린 학습 하나를 건너뛴다 — 그날에는 흐린 미완료로 남고, 밀린 목록에서만 빠진다 */
   function skipOne(id){
     var t=findTodo(id); if(!t||t.ghost||t.done||t.del) return false;
-    t.skip=true; t.u=Date.now(); save(); return true;
+    t.skip=true; logAct(t,"건너뜀"); t.u=Date.now(); save(); return true;
   }
   function moveAny(id,to){
     var t=findTodo(id); if(!t) return "학습을 찾지 못했어요.";
@@ -1449,7 +1485,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       '<div class="fld"><span class="lb">다른 날로 옮기기 (계획이 바뀌었을 때)</span><div class="dates">'+
         '<input type="date" id="mvDate" value="'+(t.date<CUR?CUR:t.date)+'" min="'+CUR+'" max="'+END+'" aria-label="옮길 날짜">'+
         '<button class="btn" data-move-one="'+t.id+'" style="flex:none">옮기기</button></div></div>'+
-      (t.by?'<div class="chint">처음 작성 '+byTag(t.by)+'</div>':'')+
+      (t.by?'<div class="chint">처음 작성 '+byTag(t.by)+'</div>':'')+logHtml(t)+
       (c.err?'<div class="cerr">'+esc(c.err)+'</div>':'')+
       '<div class="cacts"><button class="btn primary" data-edit-save>저장</button>'+
       '<button class="btn" data-compose-cancel>취소</button>'+
@@ -1564,7 +1600,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
         '<button class="btn" data-kmove="'+k.id+'" style="flex:none">옮기기</button></div>'+
         '<div class="chint">옮기면 그날의 메인 학습이 돼요.</div>':'')+
       (kidEdit.err?'<div class="cerr">'+esc(kidEdit.err)+'</div>':'')+
-      '<div class="kf-foot"><span class="kf-me">'+(k.by?'작성 '+byTag(k.by):'')+'</span>'+
+      logHtml(k)+'<div class="kf-foot"><span class="kf-me">'+(k.by?'작성 '+byTag(k.by):'')+'</span>'+
       '<button class="btn primary" data-kedit-save>저장</button><button class="btn" data-kedit-cancel>취소</button>'+
       '<button class="btn warn" data-kdel="'+k.id+'">삭제</button></div></div>';
   }
@@ -1920,7 +1956,10 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     var meR=roleOf(getMe());
     $("keepPanel").innerHTML=
       '<div class="sec">'+secHead("role","내 역할",meR?meR.name:"정하지 않음",meR?"":"warn")+
-        '<div class="sec-body"'+(secOpen.role?"":" hidden")+'><p><b>이 폰은 누가 쓰나요?</b> 골라 두면 학습·추가 학습·코멘트에 누가 썼는지 이름이 함께 남아요.</p>'+roleChips()+'</div></div>'+
+        '<div class="sec-body"'+(secOpen.role?"":" hidden")+'><p><b>이 폰은 누가 쓰나요?</b> 골라 두면 학습·추가 학습·코멘트에 누가 썼는지 이름이 함께 남아요.</p>'+roleChips()+
+          '<div class="devrow"><span class="lb">이 폰 이름</span><input type="text" id="devName" data-devname value="'+esc(devInfo().name)+'" maxlength="10" placeholder="'+esc(devInfo().kind)+' (예: 엄마 폰)" '+INPUT_ATTRS+'>'+
+          '<span class="devid">·'+esc(devInfo().id)+'</span></div>'+
+          '<div class="sm-hint">체크·옮기기·건너뛰기·고치기·지우기를 하면 누가, 어느 폰에서, 언제 했는지 학습마다 남아요. 학습명을 누르면 볼 수 있어요.</div></div></div>'+
       '<div class="sec">'+secHead("subj","과목 관리",subjects().length+"과목","")+
         '<div class="sec-body"'+(secOpen.subj?"":" hidden")+'>'+smBody+'</div></div>'+
       '<div class="sec">'+secHead("cal","캘린더",(holiOn?"공휴일 표시":"공휴일 숨김")+" · 내 일정 "+evs.length+"개","")+
@@ -2314,6 +2353,11 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     composer[k]=el.value; composer.err="";
     if(k==="from"||k==="to"){var h=document.querySelector(".composer .chint");if(h) h.textContent=previewCount(composer);}
   }
+  document.addEventListener("change",function(e){
+    var dn=up(e.target,"[data-devname]"); if(!dn) return;
+    var o=devInfo(); o.name=dn.value.trim().slice(0,10); writeKey(DEV_KEY,JSON.stringify(o));
+    toast("이 폰 이름을 '"+devLabel()+"'(으)로 남겨요.");
+  });
   document.addEventListener("change",function(e){
     var el=up(e.target,"[data-sm-name]"); if(!el) return;
     var x=subjOf(el.getAttribute("data-sm-name")),v=el.value.trim();
