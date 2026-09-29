@@ -452,10 +452,6 @@ input::placeholder,textarea::placeholder{font-size:inherit!important;font-family
 .alog-t{display:block;font-size:11px;color:var(--ink-2);margin-bottom:2px}
 .alog-r{display:flex;flex-wrap:wrap;gap:0 7px;line-height:1.6}
 .alog-r b{font-weight:400;color:var(--ink)}
-.devrow{display:flex;align-items:center;gap:6px;margin-top:8px}
-.devrow .lb{flex:none;font-size:13px;color:var(--ink-2)}
-.devrow input{flex:1;min-width:0;font-family:inherit;font-size:13px;height:34px;padding:0 10px;color:var(--ink);background:var(--field);border:2px solid var(--line);border-radius:var(--r-sm);-webkit-appearance:none;appearance:none}
-.devrow .devid{flex:none;font-size:11px;color:var(--ink-3)}
 .askrow{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:2px 0 6px 29px;padding:7px 9px;border-radius:var(--r-sm);
   background:var(--amber-wash);font-size:12px;color:var(--ink-2)}
 .askrow .chip{min-height:28px;font-size:12px;padding:0 10px}
@@ -712,7 +708,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-29e</span>
+    <span class="ver">v2026-09-29f</span>
   </footer>
 </div>
 
@@ -777,12 +773,19 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     var o=null; try{o=JSON.parse(readKey(DEV_KEY)||"null");}catch(e){}
     if(!o||!o.id){
       var ua=(navigator.userAgent||""),kind=/iPad/.test(ua)?"iPad":/iPhone/.test(ua)?"iPhone":/Android/.test(ua)?"안드로이드":/Mac/.test(ua)?"Mac":/Windows/.test(ua)?"PC":"기기";
-      o={id:Math.random().toString(36).slice(2,6),kind:kind,name:""};
+      o={id:Math.random().toString(36).slice(2,6),kind:kind};
       writeKey(DEV_KEY,JSON.stringify(o));
     }
     return o;
   }
-  function devLabel(){var o=devInfo();return (o.name||o.kind)+"·"+o.id;}
+  /* 기기 이름표 — 사람이 고칠 수 없는 기기 정보로만 만든다: 기기 종류 + OS 버전 + 홈 화면 앱/브라우저 + 기기마다 붙는 코드 */
+  function devLabel(){
+    var o=devInfo(),ua=navigator.userAgent||"",v="";
+    var m=ua.match(/OS (\d+)[_.](\d+)/)||ua.match(/Android (\d+)(?:\.(\d+))?/)||ua.match(/Mac OS X (\d+)[_.](\d+)/);
+    if(m) v=" "+m[1]+(m[2]?"."+m[2]:"");
+    var app=false; try{app=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true;}catch(e){}
+    return o.kind+v+(app?" 홈화면 앱":" 브라우저")+"·"+o.id;
+  }
   /* 학습마다 최근 기록 6개 — [무엇, 누가(역할), 어느 폰, 언제] */
   function logAct(t,what){
     if(!t) return;
@@ -1957,9 +1960,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     $("keepPanel").innerHTML=
       '<div class="sec">'+secHead("role","내 역할",meR?meR.name:"정하지 않음",meR?"":"warn")+
         '<div class="sec-body"'+(secOpen.role?"":" hidden")+'><p><b>이 폰은 누가 쓰나요?</b> 골라 두면 학습·추가 학습·코멘트에 누가 썼는지 이름이 함께 남아요.</p>'+roleChips()+
-          '<div class="devrow"><span class="lb">이 폰 이름</span><input type="text" id="devName" data-devname value="'+esc(devInfo().name)+'" maxlength="10" placeholder="'+esc(devInfo().kind)+' (예: 엄마 폰)" '+INPUT_ATTRS+'>'+
-          '<span class="devid">·'+esc(devInfo().id)+'</span></div>'+
-          '<div class="sm-hint">체크·옮기기·건너뛰기·고치기·지우기를 하면 누가, 어느 폰에서, 언제 했는지 학습마다 남아요. 학습명을 누르면 볼 수 있어요.</div></div></div>'+
+          '<div class="sm-hint" style="margin-top:8px">체크·옮기기·건너뛰기·고치기·지우기를 하면 역할과 함께 <b>기기 정보</b>(기기 종류·홈 화면 앱/브라우저·기기 코드)가 학습마다 남아요. 이 폰: '+esc(devLabel())+'</div></div></div>'+
       '<div class="sec">'+secHead("subj","과목 관리",subjects().length+"과목","")+
         '<div class="sec-body"'+(secOpen.subj?"":" hidden")+'>'+smBody+'</div></div>'+
       '<div class="sec">'+secHead("cal","캘린더",(holiOn?"공휴일 표시":"공휴일 숨김")+" · 내 일정 "+evs.length+"개","")+
@@ -2353,11 +2354,6 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     composer[k]=el.value; composer.err="";
     if(k==="from"||k==="to"){var h=document.querySelector(".composer .chint");if(h) h.textContent=previewCount(composer);}
   }
-  document.addEventListener("change",function(e){
-    var dn=up(e.target,"[data-devname]"); if(!dn) return;
-    var o=devInfo(); o.name=dn.value.trim().slice(0,10); writeKey(DEV_KEY,JSON.stringify(o));
-    toast("이 폰 이름을 '"+devLabel()+"'(으)로 남겨요.");
-  });
   document.addEventListener("change",function(e){
     var el=up(e.target,"[data-sm-name]"); if(!el) return;
     var x=subjOf(el.getAttribute("data-sm-name")),v=el.value.trim();
