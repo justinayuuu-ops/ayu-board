@@ -174,7 +174,7 @@ header .sub{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1
   transition:left .8s var(--ease),top .8s var(--ease);
   filter:drop-shadow(0 2px 3px rgba(0,0,0,.22));
 }
-.flight .jet svg{width:100%;height:100%;display:block;animation:hover 2.6s ease-in-out infinite;transform-origin:50% 60%}
+.flight .jet svg{width:100%;height:100%;display:block;animation:hover 2.6s ease-in-out 3;transform-origin:50% 60%}
 @keyframes hover{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(-3deg)}}
 .flight .goal{position:absolute;right:0;top:-2px;width:20px;height:20px}
 .flight .fl-next{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:var(--fs-xs);margin-top:5px;position:relative;z-index:2}
@@ -708,7 +708,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   <footer>
     달력에서 날짜를 누르면 그날 학습을 보고 고칠 수 있어요.<br>
     기록은 이 기기에 저장돼요. 가끔 백업 파일로 내보내 두세요.<br>
-    <span class="ver">v2026-09-29h</span>
+    <span class="ver">v2026-09-29i</span>
   </footer>
 </div>
 
@@ -1988,7 +1988,9 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
   /* 같은 DB 주소를 넣은 폰은 모두 같은 자리(family)를 본다 — 방 번호·링크 없이 주소만으로 공유 */
   var SHARED="family";
   function syncUrl(){return sync.db.replace(/\/+$/,"")+"/"+SHARED+"/"+encodeURIComponent(KEY)+".json";}
-  function payload(){return {todos:state.todos,notes:state.notes,subjects:state.subjects,rule:state.rule,ruleAt:state.ruleAt,events:state.events,calOpt:state.calOpt,calAt:state.calAt,at:Date.now()};}
+  function payload(){ var pl=payloadBody(); lastAt=pl.at; return pl; }
+  function payloadBody(){
+    return {todos:state.todos,notes:state.notes,subjects:state.subjects,rule:state.rule,ruleAt:state.ruleAt,events:state.events,calOpt:state.calOpt,calAt:state.calAt,at:Date.now()};}
   function remOf(rem){return {todos:rem.todos||[],notes:rem.notes||{},subjects:rem.subjects||[],rule:rem.rule,ruleAt:rem.ruleAt,events:rem.events||[],calOpt:rem.calOpt,calAt:rem.calAt};}
   var quietSave=false;
   function saveQuiet(){quietSave=true;try{save();}finally{quietSave=false;}}
@@ -2012,11 +2014,22 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
     else if(booted) renderKeep();
   }
   function getRemote(){return fetch(syncUrl(),{cache:"no-store"}).then(function(r){if(!r.ok) throw 0;return r.json();});}
+  var lastAt=0,liteN=0;   /* 마지막으로 받거나 올린 서버 기록의 시각 */
+  function remoteAt(){return fetch(syncUrl().replace(/\.json$/,"/at.json"),{cache:"no-store"}).then(function(r){if(!r.ok) throw 0;return r.json();});}
   function pull(){
+    if(!sync) return;
+    /* 10번에 한 번(약 5분)은 확인 없이 전체를 받는다 — 혹시 놓친 것이 없게 */
+    if(!lastAt||(++liteN%10)===0){pullFull();return;}
+    remoteAt().then(function(at){
+      if(at&&at===lastAt){syncErr=false;syncAt=Date.now();return;}   /* 바뀐 것 없음 — 전체 기록은 받지 않는다 */
+      pullFull();
+    }).catch(function(){pullFull();});
+  }
+  function pullFull(){
     if(!sync) return;
     syncing=true; if(booted) renderKeep();
     getRemote().then(function(rem){
-      syncErr=false;syncing=false;syncAt=Date.now();
+      syncErr=false;syncing=false;syncAt=Date.now(); lastAt=(rem&&rem.at)||0;
       afterMerge(rem?mergeInto(remOf(rem)):0);
       if(remoteBehind(rem)) schedulePush();   /* 이 폰에만 있는 기록은 올린다 */
     }).catch(function(){syncErr=true;syncing=false;if(booted)renderKeep();});
@@ -2035,7 +2048,7 @@ footer{font-size:var(--fs-xs);color:var(--ink-3);text-align:center;line-height:1
       .then(function(){pushing=false;if(booted)renderKeep();if(pushAgain){pushAgain=false;schedulePush();}});
   }
   function schedulePush(){if(!sync||quietSave) return;clearTimeout(pushTimer);pushTimer=setTimeout(pushNow,1200);}
-  function startPolling(){clearInterval(pollTimer);if(!sync) return;pollTimer=setInterval(function(){if(!document.hidden) pull();},15000);}
+  function startPolling(){clearInterval(pollTimer);if(!sync) return;pollTimer=setInterval(function(){if(!document.hidden) pull();},30000);}
   function connectSync(db){
     db=(db||"").trim().replace(/\/+$/,"");
     if(!/^https:\/\/[\w.-]+\.(firebaseio\.com|firebasedatabase\.app)$/.test(db))
